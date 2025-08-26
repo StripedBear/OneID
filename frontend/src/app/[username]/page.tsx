@@ -1,7 +1,11 @@
 import Avatar from "@/components/Avatar";
 import { ChannelIcon } from "@/components/ChannelIcon";
 import QRCodeCard from "@/components/QRCodeCard";
+import QrModal from "@/components/QrModal";
 import type { PublicProfile } from "@/types";
+import { Copy } from "lucide-react";
+import CopyButton from "@/components/CopyButton";
+
 
 function normalizeHttpUrl(v: string): string {
   const x = v.trim();
@@ -17,18 +21,10 @@ function hrefFor(type: string, value: string): string {
     case "email": return `mailto:${v}`;
     case "telegram": return v.startsWith("http") ? v : `https://t.me/${v.replace(/^@/, "")}`;
     case "whatsapp": {
-      // Для wa.me допустимы только цифры, уберём плюсы/скобки/пробелы
       const num = v.startsWith("http") ? v : v.replace(/[^\d]/g, "");
       return v.startsWith("http") ? v : `https://wa.me/${num}`;
     }
-    case "signal": return v; // часто это deep-link из приложения — оставляем как есть
-    case "instagram":
-    case "twitter":
-    case "facebook":
-    case "linkedin":
-    case "github":
-    case "website":
-    case "custom":
+    case "signal": return v;
     default:
       return normalizeHttpUrl(v);
   }
@@ -49,19 +45,19 @@ export default async function PublicProfilePage({
   }
 
   const data = (await res.json()) as PublicProfile;
-
-  // Для QR достаточно относительного пути — на клиенте он станет абсолютным
   const publicUrl = `/${username}`;
 
   return (
     <div className="grid gap-6">
       <div className="flex items-center gap-4">
         <Avatar src={data.user.avatar_url ?? null} alt={data.user.display_name || data.user.username} size={72} />
-        <div>
+        <div className="flex items-center gap-2">
           <h1 className="text-2xl font-semibold">{data.user.display_name || data.user.username}</h1>
-          {data.user.bio && <p className="text-slate-300">{data.user.bio}</p>}
+          <QrModal url={typeof window !== "undefined" ? window.location.href : ""} />
         </div>
       </div>
+
+      {data.user.bio && <p className="text-slate-300">{data.user.bio}</p>}
 
       <div className="grid sm:grid-cols-2 gap-4">
         <section className="grid gap-2">
@@ -71,8 +67,7 @@ export default async function PublicProfilePage({
               const href = hrefFor(ch.type, ch.value);
               const safeHref = (() => {
                 try {
-                  // валидация для предотвращения ошибок вида "//:username"
-                  const u = new URL(href, "https://dummy.base"); // базовый домен для относительных ссылок
+                  const u = new URL(href, "https://dummy.base");
                   return href;
                 } catch {
                   return "#";
@@ -80,18 +75,19 @@ export default async function PublicProfilePage({
               })();
 
               return (
-                <li key={ch.id} className="flex items-center gap-3 border border-slate-200 dark:border-slate-800 rounded-2xl p-3">
-                  <ChannelIcon type={ch.type} />
+                <li key={ch.id} className="flex items-center gap-4 border border-slate-200 dark:border-slate-800 rounded-2xl p-3">
+                  {/* Иконка-ссылка */}
+                  <a href={safeHref} target="_blank" rel="noreferrer">
+                    <ChannelIcon type={ch.type} className="w-6 h-6" />
+                  </a>
+
+                  {/* Кнопка копировать */}
+                  <CopyButton value={ch.value} />
+
+
+                  {/* Метаданные */}
                   <div className="flex-1">
                     <div className="font-medium">{ch.label || ch.type}</div>
-                    <a
-                      className="text-sm text-blue-600 dark:text-blue-300 hover:underline break-all"
-                      href={safeHref}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {ch.value}
-                    </a>
                     <div className="text-xs text-slate-500">
                       {ch.is_public ? "Публичный" : "Скрытый"} {ch.is_primary ? "• Основной" : ""} • Порядок: {ch.sort_order}
                     </div>
