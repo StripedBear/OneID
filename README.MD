@@ -16,3 +16,8 @@ npm run dev
 
 
 ✅ Клиент доступен на http://localhost:3000
+
+npm run dev -- -H 0.0.0.0 -p 3000
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+todo: docker image
