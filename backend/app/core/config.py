@@ -1,5 +1,4 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import AnyUrl
 
 
 class Settings(BaseSettings):
@@ -11,9 +10,12 @@ class Settings(BaseSettings):
     # Пример для Postgres (на проде/стейдже):
     # postgresql+psycopg://user:password@host:5432/dbname
 
-    # JWT — добавим использование на следующем шаге
+    # JWT
     SECRET_KEY: str = "CHANGE_ME_IN_PRODUCTION"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 дней
+
+    # CORS
+    CORS_ORIGINS: list[str] = ["http://localhost:3000"]
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

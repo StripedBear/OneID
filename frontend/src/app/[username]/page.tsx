@@ -1,7 +1,7 @@
 import Avatar from "@/components/Avatar";
 import { ChannelIcon } from "@/components/ChannelIcon";
 import QRCodeCard from "@/components/QRCodeCard";
-import QrModal from "@/components/QrModal";
+import QrButton from "@/components/QrButton";
 import type { PublicProfile } from "@/types";
 import { Copy } from "lucide-react";
 import CopyButton from "@/components/CopyButton";
@@ -53,7 +53,7 @@ export default async function PublicProfilePage({
         <Avatar src={data.user.avatar_url ?? null} alt={data.user.display_name || data.user.username} size={72} />
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-semibold">{data.user.display_name || data.user.username}</h1>
-          <QrModal url={typeof window !== "undefined" ? window.location.href : ""} />
+          <QrButton />
         </div>
       </div>
 

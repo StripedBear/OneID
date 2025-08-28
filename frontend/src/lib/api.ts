@@ -12,12 +12,16 @@ export async function api<T>(
   }
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
-  const res = await fetch(`${BASE}${path}`, { ...opts, headers, cache: "no-store" });
-  const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
-  if (!res.ok) {
-    const detail = (data && (data.detail || data.message)) || res.statusText;
-    throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+  try {
+    const res = await fetch(`${BASE}${path}`, { ...opts, headers, cache: "no-store" });
+    const text = await res.text();
+    const data = text ? JSON.parse(text) : null;
+    if (!res.ok) {
+      const detail = (data && (data.detail || data.message)) || res.statusText;
+      throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+    }
+    return data as T;
+  } catch (err: any) {
+    throw new Error(err?.message || "Network error");
   }
-  return data as T;
 }

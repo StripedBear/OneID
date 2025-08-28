@@ -6,6 +6,7 @@ import type { UserPublic, Channel } from "@/types";
 import Avatar from "@/components/Avatar";
 import { ChannelIcon } from "@/components/ChannelIcon";
 import Link from "next/link";
+import { t } from "@/lib/i18n";
 
 type NewChannel = {
   type: string;
@@ -90,15 +91,12 @@ export default function DashboardPage() {
           )}
         </div>
         <div className="flex-1" />
-        <button onClick={() => { clearToken(); location.href="/"; }} className="text-sm border border-slate-700 px-3 py-1 rounded-xl hover:bg-slate-800">
-          Выйти
-        </button>
       </div>
 
       {error && <div className="text-red-400 text-sm">{error}</div>}
 
       <section className="grid gap-3">
-        <h2 className="text-lg font-semibold">Мои каналы</h2>
+        <h2 className="text-lg font-semibold">{t("dashboard_my_channels")}</h2>
         <ul className="grid gap-2">
           {channels.map((ch) => (
             <li key={ch.id} className="flex items-center gap-3 border border-slate-200 dark:border-slate-800 rounded-2xl p-3">
@@ -115,7 +113,7 @@ export default function DashboardPage() {
                 className="text-sm border border-slate-700 px-3 py-1 rounded-xl hover:bg-slate-800"
                 disabled={busy}
               >
-                Удалить
+                {t("dashboard_delete")}
               </button>
             </li>
           ))}
@@ -124,7 +122,7 @@ export default function DashboardPage() {
       </section>
 
       <section className="grid gap-3">
-        <h2 className="text-lg font-semibold">Добавить канал</h2>
+        <h2 className="text-lg font-semibold">{t("dashboard_add_channel")}</h2>
         <ChannelForm onSubmit={addChannel} disabled={busy} />
       </section>
     </div>

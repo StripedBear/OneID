@@ -27,10 +27,9 @@ def public_profile(username: str, db: Session = Depends(get_db)) -> dict:
         ).all()
     )
 
-    # Возвращаем минимально необходимую публичную инфу
+    # Возвращаем минимально необходимую публичную инфу (без email)
     user_data = UserPublic.model_validate(user).model_dump()
-    # email у нас хранится, но публиковать его не обязательно — фронт решит, что показывать.
-    # В MVP вернём email как есть (можно вырезать по желанию).
+    user_data.pop("email", None)
 
     return {
         "user": user_data,

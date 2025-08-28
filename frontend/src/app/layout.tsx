@@ -4,7 +4,7 @@ import Link from "next/link";
 import Script from "next/script";
 import PWARegister from "@/components/PWARegister";
 import Providers from "@/components/Providers";
-import ThemeToggle from "@/components/ThemeToggle"; // ← обычный импорт КЛИЕНТ-компонента
+import NavLinks from "@/components/NavLinks";
 
 export const metadata: Metadata = {
   title: "OneID — живая записная книжка",
@@ -42,13 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <header className="border-b border-slate-200 dark:border-slate-800">
             <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
               <Link href="/" className="text-xl font-bold">OneID</Link>
-              <nav className="text-sm flex items-center gap-4">
-                <Link href="/login" className="hover:underline">Войти</Link>
-                <Link href="/register" className="hover:underline">Регистрация</Link>
-                <Link href="/dashboard" className="hover:underline">Дашборд</Link>
-                <Link href="/dashboard/contacts" className="hover:underline">Контакты</Link>
-                <ThemeToggle />
-              </nav>
+              <NavLinks />
             </div>
           </header>
           <main className="mx-auto max-w-5xl px-4 py-8">

@@ -3,8 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.core.config import settings
-from app.db.session import engine
-from app.db.base import Base
 
 from fastapi import APIRouter
 from app.api.routes import auth as auth_routes
@@ -17,19 +15,14 @@ app = FastAPI(
     description="MVP: Живая записная книжка / DNS для людей",
 )
 
-# CORS — для локальной разработки с Next.js
+# CORS — для локальной разработки с Next.js и для продакшена через .env
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # в проде ограничь доменами фронтенда
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Старт: создаём таблицы локально (SQLite)
-@app.on_event("startup")
-def on_startup():
-    Base.metadata.create_all(bind=engine)
 
 # Системный эндпоинт
 @app.get("/health", summary="Health check", tags=["_service"])

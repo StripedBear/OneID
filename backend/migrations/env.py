@@ -7,6 +7,9 @@ from alembic import context
 # импортируем настройки и Base (метаданные)
 from app.core.config import settings
 from app.db.base import Base
+# Explicitly import models for Alembic's metadata discovery (without app runtime circular deps)
+from app.models import user as _user_model  # noqa: F401
+from app.models import channel as _channel_model  # noqa: F401
 
 # Это конфиг Alembic, предоставляет доступ к значениям внутри .ini файла
 config = context.config

@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@/lib/api";
+import { t } from "@/lib/i18n";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -36,10 +37,10 @@ export default function RegisterPage() {
 
   return (
     <div className="max-w-md mx-auto grid gap-4">
-      <h1 className="text-2xl font-semibold">Регистрация</h1>
+      <h1 className="text-2xl font-semibold">{t("register_title")}</h1>
       {error && <div className="text-red-400 text-sm">{error}</div>}
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3">
-        <input placeholder="Email" className="input" {...register("email")} />
+        <input placeholder={t("login_email")} className="input" {...register("email")} />
         {errors.email && <p className="err">{errors.email.message}</p>}
 
         <input placeholder="Username" className="input" {...register("username")} />
@@ -49,10 +50,10 @@ export default function RegisterPage() {
         <input placeholder="Avatar URL (опц.)" className="input" {...register("avatar_url")} />
         <textarea placeholder="Bio (опц.)" className="input" rows={3} {...register("bio")} />
 
-        <input placeholder="Пароль" type="password" className="input" {...register("password")} />
+        <input placeholder={t("login_password")} type="password" className="input" {...register("password")} />
         {errors.password && <p className="err">{errors.password.message}</p>}
 
-        <button disabled={isSubmitting} className="btn-primary">{isSubmitting ? "Создаю..." : "Создать аккаунт"}</button>
+        <button disabled={isSubmitting} className="btn-primary">{isSubmitting ? "Создаю..." : t("register_submit")}</button>
       </form>
 
       <style jsx>{`
