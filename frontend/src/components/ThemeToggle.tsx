@@ -2,54 +2,56 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
-
-const STORAGE_KEY = "theme"; // тот же ключ, что использует ранний скрипт
+import { useTheme } from "next-themes";
 
 export default function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [isDark, setIsDark] = useState(false);
-
-  // Инициализируемся по фактическому состоянию DOM/хранилища
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      const system = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      const theme = stored || system;
-      setIsDark(theme === "dark");
-    } catch {
-      // no-op
-    } finally {
-      setMounted(true);
-    }
+  
+  useEffect(() => { 
+    setMounted(true); 
   }, []);
 
-  // Применяем тему к <html> и сохраняем
+  // Read current theme from DOM classes to avoid hydration mismatch
+  const [isDark, setIsDark] = useState(false);
+  
   useEffect(() => {
-    if (!mounted) return;
-    const root = document.documentElement;
-    if (isDark) {
-      root.classList.add("dark");
-      root.style.colorScheme = "dark";
-      localStorage.setItem(STORAGE_KEY, "dark");
-    } else {
-      root.classList.remove("dark");
-      root.style.colorScheme = "light";
-      localStorage.setItem(STORAGE_KEY, "light");
+    if (mounted) {
+      const root = document.documentElement;
+      const hasDarkClass = root.classList.contains('dark');
+      setIsDark(hasDarkClass);
     }
-  }, [isDark, mounted]);
+  }, [mounted, theme]);
 
-  if (!mounted) return null; // показываем кнопку только после монтирования
+  const handleToggle = () => {
+    if (mounted) {
+      const newTheme = isDark ? "light" : "dark";
+      setTheme(newTheme);
+      
+      // Immediately update local state and DOM
+      setIsDark(!isDark);
+      const root = document.documentElement;
+      if (newTheme === "dark") {
+        root.classList.add("dark");
+        root.style.colorScheme = "dark";
+      } else {
+        root.classList.remove("dark");
+        root.style.colorScheme = "light";
+      }
+    }
+  };
 
   return (
     <button
       type="button"
-      aria-label="Переключить тему"
-      onClick={() => setIsDark((v) => !v)}
+      aria-label="Toggle theme"
+      onClick={handleToggle}
       className="inline-flex items-center gap-2 text-sm border border-slate-300 dark:border-slate-700 px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
-      title={isDark ? "Светлая тема" : "Тёмная тема"}
+      title={isDark ? "Light theme" : "Dark theme"}
+      style={{ visibility: mounted ? "visible" : "hidden" }}
     >
       {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-      <span className="hidden sm:inline">{isDark ? "Светлая" : "Тёмная"}</span>
+      <span className="hidden sm:inline">{isDark ? "Light" : "Dark"}</span>
     </button>
   );
 }

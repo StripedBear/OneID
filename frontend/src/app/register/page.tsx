@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@/lib/api";
-import { t } from "@/lib/i18n";
+import { useI18n } from "@/components/I18nProvider";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -19,6 +19,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function RegisterPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema)
@@ -31,7 +32,7 @@ export default function RegisterPage() {
       await api("/auth/register", { method: "POST", body: JSON.stringify(values) });
       router.push("/login");
     } catch (e: any) {
-      setError(e.message || "Ошибка регистрации");
+      setError(e.message || "Registration error");
     }
   };
 
@@ -40,20 +41,20 @@ export default function RegisterPage() {
       <h1 className="text-2xl font-semibold">{t("register_title")}</h1>
       {error && <div className="text-red-400 text-sm">{error}</div>}
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3">
-        <input placeholder={t("login_email")} className="input" {...register("email")} />
+        <input placeholder={t("register_email")} className="input" {...register("email")} />
         {errors.email && <p className="err">{errors.email.message}</p>}
 
-        <input placeholder="Username" className="input" {...register("username")} />
+        <input placeholder={t("register_username")} className="input" {...register("username")} />
         {errors.username && <p className="err">{errors.username.message}</p>}
 
-        <input placeholder="Отображаемое имя (опц.)" className="input" {...register("display_name")} />
-        <input placeholder="Avatar URL (опц.)" className="input" {...register("avatar_url")} />
-        <textarea placeholder="Bio (опц.)" className="input" rows={3} {...register("bio")} />
+        <input placeholder={t("register_display_name")} className="input" {...register("display_name")} />
+        <input placeholder={t("register_avatar_url")} className="input" {...register("avatar_url")} />
+        <textarea placeholder={t("register_bio")} className="input" rows={3} {...register("bio")} />
 
-        <input placeholder={t("login_password")} type="password" className="input" {...register("password")} />
+        <input placeholder={t("register_password")} type="password" className="input" {...register("password")} />
         {errors.password && <p className="err">{errors.password.message}</p>}
 
-        <button disabled={isSubmitting} className="btn-primary">{isSubmitting ? "Создаю..." : t("register_submit")}</button>
+        <button disabled={isSubmitting} className="btn-primary">{isSubmitting ? "Creating..." : t("register_submit")}</button>
       </form>
 
       <style jsx>{`

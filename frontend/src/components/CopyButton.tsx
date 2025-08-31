@@ -10,10 +10,10 @@ export default function CopyButton({ value }: { value: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="text-slate-400 hover:text-slate-100"
-      title="Скопировать"
+      className="text-slate-400 hover:text-slate-100 p-1 rounded-lg hover:bg-slate-700/50 transition-colors"
+      title="Copy"
     >
-      <Copy className="w-5 h-5" />
+      <Copy className="w-4 h-4" />
     </button>
   );
 }

@@ -4,17 +4,17 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
 
-# импортируем настройки и Base (метаданные)
+# Import settings and Base (metadata)
 from app.core.config import settings
 from app.db.base import Base
 # Explicitly import models for Alembic's metadata discovery (without app runtime circular deps)
 from app.models import user as _user_model  # noqa: F401
 from app.models import channel as _channel_model  # noqa: F401
 
-# Это конфиг Alembic, предоставляет доступ к значениям внутри .ini файла
+# This is Alembic config, provides access to values inside .ini file
 config = context.config
 
-# Логи Alembic
+# Alembic logs
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
@@ -28,7 +28,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        compare_type=True,  # отслеживать изменения типов
+        compare_type=True,  # track type changes
     )
 
     with context.begin_transaction():

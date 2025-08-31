@@ -1,10 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.core.config import settings
-
-from fastapi import APIRouter
 from app.api.routes import auth as auth_routes
 from app.api.routes import channels as channels_routes
 from app.api.routes import public as public_routes

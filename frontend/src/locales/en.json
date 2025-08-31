@@ -1,0 +1,31 @@
+{
+  "app_title": "OneID — living address book",
+  "nav_login": "Log in",
+  "nav_register": "Sign up",
+  "nav_dashboard": "Dashboard",
+  "nav_contacts": "Contacts",
+  "nav_logout": "Log out",
+
+  "login_title": "Log in",
+  "login_email": "Email",
+  "register_email": "Email",
+  "register_password": "Password",
+  "login_password": "Password",
+  "login_submit": "Log in",
+
+  "register_title": "Sign up",
+  "register_username": "Username",
+  "register_display_name": "Display name (optional)",
+  "register_avatar_url": "Avatar URL (optional)",
+  "register_bio": "Bio (optional)",
+  "register_submit": "Create account",
+
+  "dashboard_my_channels": "My channels",
+  "dashboard_add_channel": "Add channel",
+  "dashboard_delete": "Delete",
+  "dashboard_public_profile": "Public profile",
+  "dashboard_not_logged_in": "You are not logged in.",
+  "dashboard_go_login": "Go to login"
+}
+
+

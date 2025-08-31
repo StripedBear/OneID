@@ -4,6 +4,9 @@ import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { getToken } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import { useI18n } from "@/components/I18nProvider";
 
 type Contact = {
   username: string;
@@ -14,15 +17,27 @@ type Contact = {
 export default function ContactsPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [search, setSearch] = useState("");
+  const router = useRouter();
+  const token = getToken();
+  const { t } = useI18n();
 
   useEffect(() => {
-    // TODO: Заменить на реальный запрос к API
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+    
+    // TODO: Replace with real API request
     setContacts([
       { username: "alice", displayName: "Alice", avatarUrl: null },
       { username: "bob", displayName: "Bob", avatarUrl: null },
       { username: "charlie", displayName: "Charlie", avatarUrl: null },
     ]);
-  }, []);
+  }, [token, router]);
+
+  if (!token) {
+    return null; // Will redirect to login
+  }
 
   const filtered = contacts.filter((c) =>
     c.displayName.toLowerCase().includes(search.toLowerCase())
@@ -30,19 +45,19 @@ export default function ContactsPage() {
 
   return (
     <div className="space-y-6">
-    <div className="flex items-center justify-between">
-  <h1 className="text-2xl font-bold">Контакты</h1>
-  <Link
-    href="/dashboard/contacts/add"
-    className="inline-flex items-center gap-2 text-sm border border-slate-300 dark:border-slate-700 px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
-  >
-    <Plus className="w-4 h-4" />
-    Добавить
-  </Link>
-</div>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">{t("contacts_title")}</h1>
+        <Link
+          href="/dashboard/contacts/add"
+          className="inline-flex items-center gap-2 text-sm border border-slate-300 dark:border-slate-700 px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+        >
+          <Plus className="w-4 h-4" />
+          {t("contacts_add")}
+        </Link>
+      </div>
       <input
         type="text"
-        placeholder="Поиск по имени..."
+        placeholder={t("contacts_search_placeholder")}
         className="w-full border border-slate-300 dark:border-slate-700 rounded-md px-4 py-2"
         value={search}
         onChange={(e) => setSearch(e.target.value)}

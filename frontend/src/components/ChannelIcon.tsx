@@ -1,19 +1,19 @@
 import { Phone, Mail, MessageCircle, Send, Globe, Github, Instagram, Linkedin, Twitter, Link as LinkIcon } from "lucide-react";
 
-export function ChannelIcon({ type }: { type: string }) {
+export function ChannelIcon({ type, className = "w-5 h-5" }: { type: string; className?: string }) {
   const iconMap: Record<string, JSX.Element> = {
-    phone: <Phone />,
-    email: <Mail />,
-    telegram: <Send />,
-    whatsapp: <MessageCircle />,
-    signal: <MessageCircle />,
-    instagram: <Instagram />,
-    twitter: <Twitter />,
-    facebook: <LinkIcon />,
-    linkedin: <Linkedin />,
-    website: <Globe />,
-    github: <Github />,
-    custom: <LinkIcon />,
+    phone: <Phone className={className} />,
+    email: <Mail className={className} />,
+    telegram: <Send className={className} />,
+    whatsapp: <MessageCircle className={className} />,
+    signal: <MessageCircle className={className} />,
+    instagram: <Instagram className={className} />,
+    twitter: <Twitter className={className} />,
+    facebook: <LinkIcon className={className} />,
+    linkedin: <Linkedin className={className} />,
+    website: <Globe className={className} />,
+    github: <Github className={className} />,
+    custom: <LinkIcon className={className} />,
   };
-  return <span className="inline-flex w-5 h-5 items-center">{iconMap[type] ?? <LinkIcon />}</span>;
+  return <span className="inline-flex items-center">{iconMap[type] ?? <LinkIcon className={className} />}</span>;
 }

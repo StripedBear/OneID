@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@/lib/api";
-import { t } from "@/lib/i18n";
+import { useI18n } from "@/components/I18nProvider";
 import { setToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -17,11 +17,13 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function LoginPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema)
   });
   const [error, setError] = useState<string | null>(null);
+  // rerender handled naturally via context change
 
   const onSubmit = async (values: FormData) => {
     setError(null);
@@ -30,7 +32,7 @@ export default function LoginPage() {
       setToken(data.access_token);
       router.push("/dashboard");
     } catch (e: any) {
-      setError(e.message || "Ошибка входа");
+      setError(e.message || "Login error");
     }
   };
 
@@ -45,7 +47,7 @@ export default function LoginPage() {
         <input placeholder={t("login_password")} type="password" className="input" {...register("password")} />
         {errors.password && <p className="err">{errors.password.message}</p>}
 
-        <button disabled={isSubmitting} className="btn-primary">{isSubmitting ? "Вхожу..." : t("login_submit")}</button>
+        <button disabled={isSubmitting} className="btn-primary">{isSubmitting ? "Signing in..." : t("login_submit")}</button>
       </form>
       <style jsx>{`
         .input { background:#0b1220; border:1px solid #1f2937; border-radius:14px; padding:10px 14px; }

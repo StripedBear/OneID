@@ -12,7 +12,7 @@ export default function QrModal({ url }: { url: string }) {
       <button
         onClick={() => setIsOpen(true)}
         className="ml-2 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-        title="Открыть QR"
+        title="Open QR"
       >
         <QrCode className="w-5 h-5" />
       </button>
@@ -28,7 +28,7 @@ export default function QrModal({ url }: { url: string }) {
             onClick={() => setIsOpen(false)}
           />
           <div className="relative bg-white dark:bg-slate-900 p-6 rounded-xl shadow-xl w-[min(90vw,380px)]">
-            <div className="text-lg font-semibold mb-4">Отсканируйте QR-код</div>
+            <div className="text-lg font-semibold mb-4">Scan QR code</div>
             <div className="bg-white p-3 rounded-xl inline-block mx-auto">
               <QRCode value={url || ""} size={220} />
             </div>
@@ -38,7 +38,7 @@ export default function QrModal({ url }: { url: string }) {
                 onClick={() => setIsOpen(false)}
                 className="px-4 py-2 bg-slate-200 dark:bg-slate-800 rounded-lg hover:bg-slate-300 dark:hover:bg-slate-700"
               >
-                Закрыть
+                Close
               </button>
             </div>
           </div>

@@ -2,26 +2,23 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import ThemeToggle from "./ThemeToggle";
 import { getToken, clearToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { t } from "@/lib/i18n";
-import LocaleToggle from "@/components/LocaleToggle";
+import { useI18n } from "@/components/I18nProvider";
 
 export default function NavLinks() {
   const [hasToken, setHasToken] = useState(false);
+  const { t } = useI18n();
   const router = useRouter();
 
-  useEffect(() => {
-    setHasToken(!!getToken());
-  }, []);
+  useEffect(() => { setHasToken(!!getToken()); }, []);
 
   return (
     <nav className="text-sm flex items-center gap-4">
       {!hasToken && <Link href="/login" className="hover:underline">{t("nav_login")}</Link>}
       {!hasToken && <Link href="/register" className="hover:underline">{t("nav_register")}</Link>}
-      <Link href="/dashboard" className="hover:underline">{t("nav_dashboard")}</Link>
-      <Link href="/dashboard/contacts" className="hover:underline">{t("nav_contacts")}</Link>
+      {hasToken && <Link href="/dashboard" className="hover:underline">{t("nav_dashboard")}</Link>}
+      {hasToken && <Link href="/dashboard/contacts" className="hover:underline">{t("nav_contacts")}</Link>}
       {hasToken && (
         <button
           onClick={() => { clearToken(); router.push("/"); }}
@@ -30,8 +27,6 @@ export default function NavLinks() {
           {t("nav_logout")}
         </button>
       )}
-      <ThemeToggle />
-      <LocaleToggle />
     </nav>
   );
 }
