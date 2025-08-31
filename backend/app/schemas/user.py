@@ -6,6 +6,8 @@ class UserBase(BaseModel):
     email: EmailStr
     username: str = Field(min_length=3, max_length=50)
     display_name: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
     avatar_url: str | None = None
     bio: str | None = None
 
@@ -19,6 +21,8 @@ class UserPublic(BaseModel):
     email: EmailStr
     username: str
     display_name: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
     avatar_url: str | None = None
     bio: str | None = None
     created_at: datetime

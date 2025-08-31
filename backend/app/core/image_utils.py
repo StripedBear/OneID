@@ -113,7 +113,9 @@ def cleanup_temp_file(file_path: str) -> None:
 
 def get_avatar_url(filename: str) -> str:
     """Generate avatar URL from filename."""
-    return f"/uploads/avatars/{filename}"
+    # Get base URL from environment or use default
+    base_url = os.getenv("API_BASE_URL", "http://localhost:8000")
+    return f"{base_url}/uploads/avatars/{filename}"
 
 def validate_image_dimensions(file_path: str) -> bool:
     """Validate image dimensions are reasonable."""

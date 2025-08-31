@@ -1,7 +1,8 @@
+import React from "react";
 import { Phone, Mail, MessageCircle, Send, Globe, Github, Instagram, Linkedin, Twitter, Link as LinkIcon } from "lucide-react";
 
 export function ChannelIcon({ type, className = "w-5 h-5" }: { type: string; className?: string }) {
-  const iconMap: Record<string, JSX.Element> = {
+  const iconMap: Record<string, React.ReactElement> = {
     phone: <Phone className={className} />,
     email: <Mail className={className} />,
     telegram: <Send className={className} />,

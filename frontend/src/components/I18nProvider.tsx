@@ -19,7 +19,7 @@ const messages: Record<Locale, Messages> = { en };
 export function I18nProvider({ children }: { children: ReactNode }) {
   const locale: Locale = "en";
 
-  const setLocale = (newLocale: Locale) => {
+  const setLocale = () => {
     // No-op since we only support English
   };
 

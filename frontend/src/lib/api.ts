@@ -21,7 +21,7 @@ export async function api<T>(
       throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
     }
     return data as T;
-  } catch (err: any) {
-    throw new Error(err?.message || "Network error");
+  } catch (err: unknown) {
+    throw new Error(err instanceof Error ? err.message : "Network error");
   }
 }

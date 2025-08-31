@@ -42,6 +42,8 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
         "email": current_user.email,
         "username": current_user.username,
         "display_name": current_user.display_name,
+        "first_name": current_user.first_name,
+        "last_name": current_user.last_name,
         "avatar_url": current_user.avatar_url,
         "bio": current_user.bio,
         "created_at": current_user.created_at,
@@ -110,4 +112,72 @@ async def upload_avatar(
         raise HTTPException(
             status_code=500, 
             detail=f"Failed to upload avatar: {str(e)}"
+        )
+
+
+@router.put("/profile")
+async def update_profile(
+    profile_data: dict,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Update user profile information.
+    """
+    try:
+        # Update user profile fields
+        updated_user = crud_user.update_user_profile(db, current_user.id, profile_data)
+        
+        return {
+            "id": updated_user.id,
+            "email": updated_user.email,
+            "username": updated_user.username,
+            "display_name": updated_user.display_name,
+            "first_name": updated_user.first_name,
+            "last_name": updated_user.last_name,
+            "avatar_url": updated_user.avatar_url,
+            "bio": updated_user.bio,
+            "created_at": updated_user.created_at,
+            "updated_at": updated_user.updated_at
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to update profile: {str(e)}"
+        )
+
+@router.delete("/avatar")
+async def remove_avatar(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Remove user avatar.
+    """
+    try:
+        if current_user.avatar_url:
+            # Delete the file from filesystem
+            try:
+                avatar_path = os.path.join(os.path.dirname(__file__), "..", "..", "uploads", "avatars", os.path.basename(current_user.avatar_url))
+                if os.path.exists(avatar_path):
+                    os.remove(avatar_path)
+            except Exception as e:
+                print(f"Warning: Could not delete avatar file: {e}")
+            
+            # Clear avatar_url in database
+            crud_user.update_user_avatar(db, current_user.id, "")
+            
+            return {
+                "message": "Avatar removed successfully",
+                "avatar_url": ""
+            }
+        else:
+            return {
+                "message": "No avatar to remove",
+                "avatar_url": ""
+            }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to remove avatar: {str(e)}"
         )

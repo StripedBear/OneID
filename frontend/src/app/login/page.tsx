@@ -31,8 +31,8 @@ export default function LoginPage() {
       const data = await api<TokenResponse>("/auth/login", { method: "POST", body: JSON.stringify(values) });
       setToken(data.access_token);
       router.push("/dashboard");
-    } catch (e: any) {
-      setError(e.message || "Login error");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Login error");
     }
   };
 

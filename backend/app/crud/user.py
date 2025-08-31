@@ -24,6 +24,8 @@ def get_by_username(db: Session, username: str) -> Optional[User]:
 
 def create(db: Session, *, email: str, username: str, password: str,
            display_name: str | None = None,
+           first_name: str | None = None,
+           last_name: str | None = None,
            avatar_url: str | None = None,
            bio: str | None = None) -> User:
     user = User(
@@ -31,6 +33,8 @@ def create(db: Session, *, email: str, username: str, password: str,
         username=username,
         password_hash=get_password_hash(password),
         display_name=display_name,
+        first_name=first_name,
+        last_name=last_name,
         avatar_url=avatar_url,
         bio=bio,
     )
@@ -57,6 +61,8 @@ def create_user(db: Session, user_data: UserRegister) -> User:
         username=user_data.username,
         password_hash=hashed_password,
         display_name=user_data.display_name,
+        first_name=user_data.first_name,
+        last_name=user_data.last_name,
         avatar_url=user_data.avatar_url,
         bio=user_data.bio
     )
@@ -84,6 +90,27 @@ def update_user_avatar(db: Session, user_id: int, avatar_url: str) -> User:
         raise ValueError("User not found")
     
     user.avatar_url = avatar_url
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+def update_user_profile(db: Session, user_id: int, profile_data: dict) -> User:
+    """Update user's profile information."""
+    user = get(db, user_id)
+    if not user:
+        raise ValueError("User not found")
+    
+    # Update allowed fields
+    if 'first_name' in profile_data:
+        user.first_name = profile_data['first_name']
+    if 'last_name' in profile_data:
+        user.last_name = profile_data['last_name']
+    if 'display_name' in profile_data:
+        user.display_name = profile_data['display_name']
+    if 'bio' in profile_data:
+        user.bio = profile_data['bio']
+    
     db.commit()
     db.refresh(user)
     return user

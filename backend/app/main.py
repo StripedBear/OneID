@@ -1,6 +1,8 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+import os
 
 from app.core.config import settings
 from app.api.routes import auth as auth_routes
@@ -12,6 +14,13 @@ app = FastAPI(
     version="0.1.0",
     description="MVP: Живая записная книжка / DNS для людей",
 )
+
+# Раздача статических файлов (аватары)
+uploads_dir = os.path.join(os.path.dirname(__file__), "..", "uploads")
+if not os.path.exists(uploads_dir):
+    os.makedirs(uploads_dir, exist_ok=True)
+
+app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 # CORS — для локальной разработки с Next.js и для продакшена через .env
 app.add_middleware(

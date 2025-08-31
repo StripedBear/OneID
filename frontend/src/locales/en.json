@@ -25,7 +25,37 @@
   "dashboard_delete": "Delete",
   "dashboard_public_profile": "Public profile",
   "dashboard_not_logged_in": "You are not logged in.",
-  "dashboard_go_login": "Go to login"
+  "dashboard_go_login": "Go to login",
+
+  "add_contact_title": "Add Contact",
+  "add_contact_search_placeholder": "Search by name or username...",
+  "add_contact_search": "Search",
+  "add_contact_user_not_found": "User not found",
+  "add_contact_invite": "Send invitation",
+  "add_contact_back": "Back to contacts",
+
+  "contacts_title": "Contacts",
+  "contacts_add": "Add contact",
+  "contacts_search_placeholder": "Search contacts...",
+
+  "home_subtitle": "Current communication channels by permanent link",
+  "home_public_profiles_title": "Public Profiles",
+  "home_public_profiles_desc": "Discover people and their channels:",
+  "home_public_profiles_examples": "Examples:",
+  "home_get_started": "Get Started",
+  "home_have_account": "I have an account",
+
+  "avatar_upload_drop_text": "Drop image here or click to browse",
+  "avatar_upload_supported_formats": "PNG, JPG, WebP up to 5MB",
+  "avatar_upload_uploading": "Uploading...",
+  "avatar_upload_error_file_type": "Please select an image file",
+  "avatar_upload_error_file_size": "File size must be less than 5MB",
+  "avatar_upload_error_upload_failed": "Upload failed",
+  "avatar_upload_error_remove_failed": "Failed to remove avatar",
+  "avatar_upload_remove_tooltip": "Remove avatar",
+  "avatar_upload_click_to_view": "Click to view full size",
+  "avatar_upload_close_modal": "Close modal",
+  "avatar_upload_modal_description": "Click outside or press ESC to close"
 }
 
 

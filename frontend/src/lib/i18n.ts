@@ -6,13 +6,13 @@ import en from "@/locales/en.json";
 
 const messages: Record<Locale, Record<string, string>> = { en } as const;
 
-let currentLocale: Locale = "en";
+const currentLocale: Locale = "en";
 
 export function t(key: string): string {
   return (messages[currentLocale] && messages[currentLocale][key]) || key;
 }
 
-export function setLocalePreference(locale: Locale) {
+export function setLocalePreference() {
   // No-op since we only support English
 }
 
@@ -20,7 +20,7 @@ export function getLocalePreference(): Locale {
   return currentLocale;
 }
 
-export function changeLocale(next: Locale) {
+export function changeLocale() {
   // No-op since we only support English
 }
 

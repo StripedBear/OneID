@@ -31,8 +31,8 @@ export default function RegisterPage() {
     try {
       await api("/auth/register", { method: "POST", body: JSON.stringify(values) });
       router.push("/login");
-    } catch (e: any) {
-      setError(e.message || "Registration error");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Registration error");
     }
   };
 
