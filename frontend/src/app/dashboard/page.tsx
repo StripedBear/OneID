@@ -5,24 +5,11 @@ import { api } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import type { UserPublic, Channel } from "@/types";
 import { ChannelIcon } from "@/components/ChannelIcon";
-import AvatarUpload from "@/components/AvatarUpload";
+import AvatarButton from "@/components/AvatarButton";
 import QRCodeCard from "@/components/QRCodeCard";
 import Link from "next/link";
 import { t } from "@/lib/i18n";
 
-// Helper function to convert relative URLs to absolute backend URLs
-const getFullAvatarUrl = (avatarUrl: string | null): string | null => {
-  if (!avatarUrl) return null;
-  
-  // If it's already a full URL, return as is
-  if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
-    return avatarUrl;
-  }
-  
-  // If it's a relative path, prepend backend base URL
-  const backendBase = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
-  return `${backendBase}${avatarUrl}`;
-};
 
 // Helper function to get display name
 const getDisplayName = (user: UserPublic): string => {
@@ -164,8 +151,8 @@ export default function DashboardPage() {
     <div className="grid gap-6">
       <div className="flex flex-col items-center gap-4">
         <div className="relative">
-          <AvatarUpload 
-            currentAvatarUrl={getFullAvatarUrl(user?.avatar_url || null)} 
+          <AvatarButton 
+            currentAvatarUrl={user?.avatar_url || null} 
             onAvatarUpdate={updateAvatar}
             size="lg"
           />

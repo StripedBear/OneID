@@ -101,7 +101,7 @@ export default function PublicProfilePage({
 
       <section className="grid gap-2">
         <h2 className="text-lg font-semibold">Contact Channels</h2>
-        <ul className="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+        <ul className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
           {data.channels.map((ch) => {
             const href = hrefFor(ch.type, ch.value);
             const safeHref = (() => {
@@ -114,14 +114,14 @@ export default function PublicProfilePage({
             })();
 
             return (
-              <li key={ch.id} className="relative border border-slate-200 dark:border-slate-800 rounded-2xl p-4 w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 flex flex-col items-center justify-center hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
+              <li key={ch.id} className="relative border border-slate-200 dark:border-slate-800 rounded-lg p-2 w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 flex flex-col items-center justify-center hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
                 {/* Icon-link */}
                 <a href={safeHref} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center group">
-                  <ChannelIcon type={ch.type} className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 group-hover:scale-110 transition-transform" />
+                  <ChannelIcon type={ch.type} className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 group-hover:scale-110 transition-transform" />
                 </a>
 
                 {/* Copy button - positioned at top right */}
-                <div className="absolute top-2 right-2">
+                <div className="absolute top-1 right-1">
                   <CopyButton value={ch.value} />
                 </div>
               </li>

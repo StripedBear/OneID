@@ -28,3 +28,17 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan"
     )
+    
+    # Контакты пользователя
+    contacts: Mapped[list["Contact"]] = relationship(
+        "Contact",
+        foreign_keys="Contact.user_id",
+        back_populates="user"
+    )
+    
+    # Пользователи, которые добавили этого пользователя в контакты
+    contacted_by: Mapped[list["Contact"]] = relationship(
+        "Contact", 
+        foreign_keys="Contact.contact_user_id",
+        back_populates="contact_user"
+    )
