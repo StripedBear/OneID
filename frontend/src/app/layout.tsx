@@ -1,10 +1,10 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
-import PWARegister from "@/components/PWARegister";
-import Providers from "@/components/Providers";
-import { I18nProvider } from "@/components/I18nProvider";
-import NavLinks from "@/components/NavLinks";
+import PWARegister from "../components/PWARegister";
+import Providers from "../components/Providers";
+import { I18nProvider } from "../components/I18nProvider";
+import NavLinks from "../components/NavLinks";
 
 export const metadata: Metadata = {
   title: "OneID — living address book",
