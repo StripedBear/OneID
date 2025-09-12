@@ -1,6 +1,6 @@
 # HumanDNS - Living Address Book
 
-🔧 **Backend (FastAPI)**
+ **Backend (FastAPI)**
 ```bash
 cd backend
 python3 -m venv venv
@@ -13,18 +13,18 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-✅ Server will start on http://localhost:8000
+ Server will start on http://localhost:8000
 
-🖥️ **Frontend (Next.js + TailwindCSS)**
+ **Frontend (Next.js + TailwindCSS)**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-✅ Client will be available on http://localhost:3000
+ Client will be available on http://localhost:3000
 
-## 🆕 New Features
+##  New Features
 
 ### Avatar Upload System
 - **Secure file uploads** with comprehensive validation
@@ -45,7 +45,7 @@ npm run dev
 - **Temporary file handling** with cleanup
 - **User authentication required** for uploads
 
-## 📁 File Structure
+##  File Structure
 ```
 backend/
 ├── uploads/          # User uploaded files (auto-created)
@@ -57,14 +57,14 @@ backend/
 │       └── auth.py         # Avatar upload endpoint
 ```
 
-## 🚀 Production Deployment
+## Production Deployment
 ```bash
 # For production with external access
 npm run dev -- -H 0.0.0.0 -p 3000
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-## 📋 TODO
+##  TODO
 - [ ] Docker image
 - [ ] CDN integration for image serving
 - [ ] Image compression optimization
