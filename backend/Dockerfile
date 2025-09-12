@@ -1,9 +1,9 @@
-# HumanDNS FastAPI Backend Container
 FROM python:3.11-slim
 
-# Install system dependencies required for image processing
+# Install system dependencies required for Postgres and image processing
 RUN apt-get update && apt-get install -y \
     gcc \
+    libpq-dev \
     libmagic1 \
     libmagic-dev \
     && rm -rf /var/lib/apt/lists/*
