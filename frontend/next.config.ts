@@ -1,12 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
-  experimental: {
-    outputFileTracingRoot: undefined,
-  },
+  reactStrictMode: true,
   images: {
-    unoptimized: true, // Required for static export
+    unoptimized: true, // оставим, если у вас нет image optimization
   },
 };
 
