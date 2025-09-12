@@ -1,0 +1,13 @@
+# Grafana dashboard configuration for HumanDNS
+apiVersion: 1
+
+providers:
+  - name: 'HumanDNS Dashboards'
+    orgId: 1
+    folder: 'HumanDNS'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
