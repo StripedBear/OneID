@@ -43,12 +43,6 @@ export default function AddContactPage() {
   const router = useRouter();
   const token = getToken();
 
-  useEffect(() => {
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-  }, [token, router]);
 
   const searchUsers = useCallback(async (searchQuery: string) => {
     if (!token || searchQuery.length < 2) return;
@@ -102,80 +96,93 @@ export default function AddContactPage() {
   };
 
   if (!token) {
-    return null; // Will redirect to login
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="mb-4 text-slate-300">Вы не вошли в систему.</p>
+          <Link className="underline text-blue-400 hover:text-blue-300" href="/login">Перейти на страницу входа</Link>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Добавить контакт</h1>
+    <div className="min-h-screen bg-slate-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold text-white">Добавить контакт</h1>
 
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Введите имя пользователя..."
-          className="flex-1 border border-slate-300 dark:border-slate-700 rounded-md px-4 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyPress={handleKeyPress}
-        />
-        <button
-          onClick={handleSearch}
-          disabled={isSearching || query.trim().length < 2}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSearching ? "Поиск..." : "Найти"}
-        </button>
-      </div>
-
-      {error && (
-        <div className="p-4 border border-red-300 dark:border-red-700 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400">
-          {error}
-        </div>
-      )}
-
-      {searchResults.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold">Результаты поиска:</h3>
-          {searchResults.map((user) => (
-            <div key={user.id} className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Avatar 
-                  src={user.avatar_url || null} 
-                  alt={getDisplayName(user)} 
-                  size={48}
-                  clickable={false}
-                />
-                <div>
-                  <div className="font-semibold">{getDisplayName(user)}</div>
-                  <div className="text-slate-500 text-sm">@{user.username}</div>
-                </div>
-              </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Введите имя пользователя..."
+                className="flex-1 border border-slate-600 rounded-lg px-4 py-2 bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
+              />
               <button
-                onClick={() => addContact(user.id)}
-                disabled={user.is_contact || isAdding === user.id}
-                className={`px-4 py-2 rounded-md text-white transition-colors ${
-                  user.is_contact 
-                    ? 'bg-green-600 cursor-not-allowed' 
-                    : 'bg-blue-600 hover:bg-blue-700 disabled:opacity-50'
-                }`}
+                onClick={handleSearch}
+                disabled={isSearching || query.trim().length < 2}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {user.is_contact ? 'В контактах' : (isAdding === user.id ? 'Добавляю...' : 'Добавить')}
+                {isSearching ? "Поиск..." : "Найти"}
               </button>
             </div>
-          ))}
-        </div>
-      )}
 
-      {query.trim().length >= 2 && searchResults.length === 0 && !isSearching && !error && (
-        <div className="p-4 border border-slate-200 dark:border-slate-700 rounded-md text-center text-slate-500">
-          Пользователь не найден
-        </div>
-      )}
+            {error && (
+              <div className="p-4 border border-red-700 rounded-lg bg-red-900/20 text-red-400">
+                {error}
+              </div>
+            )}
 
-      <div>
-        <Link href="/dashboard/contacts" className="text-sm text-blue-600 hover:underline">
-          ← Назад к контактам
-        </Link>
+            {searchResults.length > 0 && (
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold text-white">Результаты поиска:</h3>
+                {searchResults.map((user) => (
+                  <div key={user.id} className="p-4 border border-slate-700 rounded-lg flex items-center justify-between bg-slate-800">
+                    <div className="flex items-center gap-3">
+                      <Avatar 
+                        src={user.avatar_url || null} 
+                        alt={getDisplayName(user)} 
+                        size={48}
+                        clickable={false}
+                      />
+                      <div>
+                        <div className="font-semibold text-white">{getDisplayName(user)}</div>
+                        <div className="text-slate-400 text-sm">@{user.username}</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => addContact(user.id)}
+                      disabled={user.is_contact || isAdding === user.id}
+                      className={`px-4 py-2 rounded-lg text-white transition-colors ${
+                        user.is_contact 
+                          ? 'bg-green-600 cursor-not-allowed' 
+                          : 'bg-blue-600 hover:bg-blue-700 disabled:opacity-50'
+                      }`}
+                    >
+                      {user.is_contact ? 'В контактах' : (isAdding === user.id ? 'Добавляю...' : 'Добавить')}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {query.trim().length >= 2 && searchResults.length === 0 && !isSearching && !error && (
+              <div className="p-4 border border-slate-700 rounded-lg text-center text-slate-400 bg-slate-800">
+                Пользователь не найден
+              </div>
+            )}
+
+            <div>
+              <Link href="/dashboard/contacts" className="text-sm text-blue-400 hover:text-blue-300 underline">
+                ← Назад к контактам
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

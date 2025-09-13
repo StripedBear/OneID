@@ -8,7 +8,6 @@ import { ChannelIcon } from "@/components/ChannelIcon";
 import AvatarButton from "@/components/AvatarButton";
 import QRCodeCard from "@/components/QRCodeCard";
 import Link from "next/link";
-import { t } from "@/lib/i18n";
 
 
 // Helper function to get display name
@@ -131,131 +130,141 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-md mx-auto text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-        <p>Loading...</p>
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-slate-300">Загрузка...</p>
+        </div>
       </div>
     );
   }
 
   if (!token) {
     return (
-      <div className="max-w-md mx-auto">
-        <p className="mb-4">Вы не вошли в систему.</p>
-        <Link className="underline" href="/login">Перейти на страницу входа</Link>
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="mb-4 text-slate-300">Вы не вошли в систему.</p>
+          <Link className="underline text-blue-400 hover:text-blue-300" href="/login">Перейти на страницу входа</Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="grid gap-6">
-      <div className="flex flex-col items-center gap-4">
-        <div className="relative">
-          <AvatarButton 
-            currentAvatarUrl={user?.avatar_url || null} 
-            onAvatarUpdate={updateAvatar}
-            size="lg"
-          />
-          {user && (
-            <button
-              onClick={() => setShowQR(true)}
-              className="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors shadow-lg"
-              title="Show QR code"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V6a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1zm12 0h2a1 1 0 001-1V6a1 1 0 00-1-1h-2a1 1 0 00-1 1v1a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-              </svg>
-            </button>
-          )}
-        </div>
-        <div className="text-center">
-          <div className="text-xl font-semibold">{user ? getDisplayName(user) : ''}</div>
-          <div className="text-slate-400 text-sm">{user?.email}</div>
-          {user && (
-            <div className="text-sm mt-2">
-              Публичный профиль:{" "}
-              <Link className="underline" href={`/${user.username}`} target="_blank" rel="noreferrer">
-                /{user.username}
-              </Link>
+    <div className="min-h-screen bg-slate-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid gap-6">
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative">
+                <AvatarButton 
+                  currentAvatarUrl={user?.avatar_url || null} 
+                  onAvatarUpdate={updateAvatar}
+                  size="lg"
+                />
+                {user && (
+                  <button
+                    onClick={() => setShowQR(true)}
+                    className="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors shadow-lg"
+                    title="Show QR code"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V6a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1zm12 0h2a1 1 0 001-1V6a1 1 0 00-1-1h-2a1 1 0 00-1 1v1a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-semibold text-white">{user ? getDisplayName(user) : ''}</div>
+                <div className="text-slate-400 text-sm">{user?.email}</div>
+                {user && (
+                  <div className="text-sm mt-2 text-slate-300">
+                    Публичный профиль:{" "}
+                    <Link className="underline text-blue-400 hover:text-blue-300" href={`/${user.username}`} target="_blank" rel="noreferrer">
+                      /{user.username}
+                    </Link>
+                  </div>
+                )}
+                <button
+                  onClick={() => setShowProfileEdit(true)}
+                  className="mt-3 text-sm text-blue-400 hover:text-blue-300 underline"
+                >
+                  Редактировать профиль
+                </button>
+              </div>
             </div>
-          )}
-          <button
-            onClick={() => setShowProfileEdit(true)}
-            className="mt-3 text-sm text-blue-500 hover:text-blue-600 underline"
-          >
-            Редактировать профиль
-          </button>
-        </div>
-      </div>
 
-      {error && <div className="text-red-400 text-sm">{error}</div>}
+            {error && <div className="text-red-400 text-sm bg-red-900/20 border border-red-700 rounded-lg p-3">{error}</div>}
 
-      <section className="grid gap-3">
-        <h2 className="text-lg font-semibold">{t("dashboard_my_channels")}</h2>
-        <ul className="grid gap-2">
-          {channels.map((ch) => (
-            <li key={ch.id} className="flex items-center gap-3 border border-slate-200 dark:border-slate-800 rounded-2xl p-3">
-              <ChannelIcon type={ch.type} />
-              <div className="flex-1">
-                <div className="font-medium">{ch.label || ch.type}</div>
-                <div className="text-sm text-slate-400 break-all">{ch.value}</div>
-                <div className="text-xs text-slate-500">
-                  {ch.is_public ? "Публичный" : "Скрытый"} {ch.is_primary ? "• Основной" : ""} • Порядок: {ch.sort_order}
+            <section className="grid gap-3">
+              <h2 className="text-lg font-semibold text-white">Мои каналы</h2>
+              <ul className="grid gap-2">
+                {channels.map((ch) => (
+                  <li key={ch.id} className="flex items-center gap-3 border border-slate-700 rounded-2xl p-3 bg-slate-800">
+                    <ChannelIcon type={ch.type} />
+                    <div className="flex-1">
+                      <div className="font-medium text-white">{ch.label || ch.type}</div>
+                      <div className="text-sm text-slate-400 break-all">{ch.value}</div>
+                      <div className="text-xs text-slate-500">
+                        {ch.is_public ? "Публичный" : "Скрытый"} {ch.is_primary ? "• Основной" : ""} • Порядок: {ch.sort_order}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => removeChannel(ch.id)}
+                      className="text-sm border border-slate-600 px-3 py-1 rounded-xl hover:bg-slate-700 text-slate-300"
+                      disabled={busy}
+                    >
+                      Удалить
+                    </button>
+                  </li>
+                ))}
+                {channels.length === 0 && <li className="text-slate-400">Пока нет каналов</li>}
+              </ul>
+            </section>
+
+            <section className="grid gap-3">
+              <h2 className="text-lg font-semibold text-white">Добавить канал</h2>
+              <ChannelForm onSubmit={addChannel} disabled={busy} />
+            </section>
+
+            {/* QR Code Modal */}
+            {showQR && user && (
+              <div 
+                className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+                onClick={() => setShowQR(false)}
+              >
+                <div 
+                  className="bg-slate-800 p-6 rounded-2xl shadow-2xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <QRCodeCard 
+                    url={`${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/${user.username}`}
+                  />
                 </div>
               </div>
-              <button
-                onClick={() => removeChannel(ch.id)}
-                className="text-sm border border-slate-700 px-3 py-1 rounded-xl hover:bg-slate-800"
-                disabled={busy}
+            )}
+
+            {/* Profile Edit Modal */}
+            {showProfileEdit && user && (
+              <div 
+                className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+                onClick={() => setShowProfileEdit(false)}
               >
-                {t("dashboard_delete")}
-              </button>
-            </li>
-          ))}
-          {channels.length === 0 && <li className="text-slate-400">Пока нет каналов</li>}
-        </ul>
-      </section>
-
-      <section className="grid gap-3">
-        <h2 className="text-lg font-semibold">{t("dashboard_add_channel")}</h2>
-        <ChannelForm onSubmit={addChannel} disabled={busy} />
-      </section>
-
-      {/* QR Code Modal */}
-      {showQR && user && (
-        <div 
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-          onClick={() => setShowQR(false)}
-        >
-          <div 
-            className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <QRCodeCard 
-              url={`${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/${user.username}`}
-            />
+                <div 
+                  className="bg-slate-800 p-6 rounded-2xl shadow-2xl max-w-md w-full"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ProfileEditForm 
+                    user={user} 
+                    onSubmit={updateProfile} 
+                    onCancel={() => setShowProfileEdit(false)}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
-
-      {/* Profile Edit Modal */}
-      {showProfileEdit && user && (
-        <div 
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-          onClick={() => setShowProfileEdit(false)}
-        >
-          <div 
-            className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-2xl max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <ProfileEditForm 
-              user={user} 
-              onSubmit={updateProfile} 
-              onCancel={() => setShowProfileEdit(false)}
-            />
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -275,12 +284,32 @@ function ChannelForm({ onSubmit, disabled }: { onSubmit: (v: NewChannel) => void
       onSubmit={(e) => { e.preventDefault(); onSubmit({ ...form, sort_order: Number(form.sort_order) || 0 }); }}
       className="grid md:grid-cols-2 gap-3"
     >
-      <select className="input" value={form.type} onChange={(e)=>setForm({...form, type:e.target.value})}>
+      <select 
+        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" 
+        value={form.type} 
+        onChange={(e)=>setForm({...form, type:e.target.value})}
+      >
         {channelTypes.map((t)=> <option key={t} value={t}>{t}</option>)}
       </select>
-      <input className="input" placeholder="Значение (телефон, @handle, URL…)" value={form.value} onChange={(e)=>setForm({...form, value:e.target.value})} />
-      <input className="input" placeholder="Метка (опц.)" value={form.label} onChange={(e)=>setForm({...form, label:e.target.value})} />
-      <input className="input" type="number" placeholder="Порядок" value={form.sort_order} onChange={(e)=>setForm({...form, sort_order:Number(e.target.value)})} />
+      <input 
+        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+        placeholder="Значение (телефон, @handle, URL…)" 
+        value={form.value} 
+        onChange={(e)=>setForm({...form, value:e.target.value})} 
+      />
+      <input 
+        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+        placeholder="Метка (опц.)" 
+        value={form.label} 
+        onChange={(e)=>setForm({...form, label:e.target.value})} 
+      />
+      <input 
+        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+        type="number" 
+        placeholder="Порядок" 
+        value={form.sort_order} 
+        onChange={(e)=>setForm({...form, sort_order:Number(e.target.value)})} 
+      />
       <label className="flex items-center gap-2 text-sm text-slate-300">
         <input type="checkbox" checked={form.is_public} onChange={(e)=>setForm({...form, is_public:e.target.checked})} /> Публичный
       </label>
@@ -288,12 +317,13 @@ function ChannelForm({ onSubmit, disabled }: { onSubmit: (v: NewChannel) => void
         <input type="checkbox" checked={form.is_primary} onChange={(e)=>setForm({...form, is_primary:e.target.checked})} /> Основной
       </label>
       <div className="md:col-span-2">
-        <button disabled={disabled} className="btn-primary">{disabled ? "Сохраняю..." : "Добавить"}</button>
+        <button 
+          disabled={disabled} 
+          className="w-full bg-white text-slate-900 py-2 px-4 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50"
+        >
+          {disabled ? "Сохраняю..." : "Добавить"}
+        </button>
       </div>
-      <style jsx>{`
-        .input { width: 100%; background:#0b1220; border:1px solid #1f2937; border-radius:14px; padding:10px 14px; }
-        .btn-primary { background:white; color:#0b1220; border-radius:14px; padding:10px 14px; }
-      `}</style>
     </form>
   );
 }
@@ -321,47 +351,47 @@ function ProfileEditForm({
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4 text-center">Редактировать профиль</h2>
+      <h2 className="text-xl font-semibold mb-4 text-center text-white">Редактировать профиль</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2">Имя</label>
+          <label className="block text-sm font-medium mb-2 text-slate-300">Имя</label>
           <input
             type="text"
             value={form.first_name}
             onChange={(e) => setForm({...form, first_name: e.target.value})}
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+            className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Введите имя"
           />
         </div>
         
         <div>
-          <label className="block text-sm font-medium mb-2">Фамилия</label>
+          <label className="block text-sm font-medium mb-2 text-slate-300">Фамилия</label>
           <input
             type="text"
             value={form.last_name}
             onChange={(e) => setForm({...form, last_name: e.target.value})}
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+            className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Введите фамилию"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Отображаемое имя (опционально)</label>
+          <label className="block text-sm font-medium mb-2 text-slate-300">Отображаемое имя (опционально)</label>
           <input
             type="text"
             value={form.display_name}
             onChange={(e) => setForm({...form, display_name: e.target.value})}
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+            className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Введите отображаемое имя"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">О себе (опционально)</label>
+          <label className="block text-sm font-medium mb-2 text-slate-300">О себе (опционально)</label>
           <textarea
             value={form.bio}
             onChange={(e) => setForm({...form, bio: e.target.value})}
-            className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+            className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Расскажите о себе"
             rows={3}
           />
@@ -371,7 +401,7 @@ function ProfileEditForm({
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+            className="flex-1 px-4 py-2 border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-700 transition-colors"
           >
             Отмена
           </button>

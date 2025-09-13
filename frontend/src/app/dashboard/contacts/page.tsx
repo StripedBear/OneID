@@ -62,13 +62,10 @@ export default function ContactsPage() {
   }, [token]);
 
   useEffect(() => {
-    if (!token) {
-      router.push("/login");
-      return;
+    if (token) {
+      loadContacts();
     }
-    
-    loadContacts();
-  }, [token, router, loadContacts]);
+  }, [token, loadContacts]);
 
   const removeContact = useCallback(async (userId: number) => {
     if (!token) return;
@@ -89,7 +86,14 @@ export default function ContactsPage() {
   }, [token]);
 
   if (!token) {
-    return null; // Will redirect to login
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="mb-4 text-slate-300">Вы не вошли в систему.</p>
+          <Link className="underline text-blue-400 hover:text-blue-300" href="/login">Перейти на страницу входа</Link>
+        </div>
+      </div>
+    );
   }
 
   const filtered = contacts.filter((contact) => {
@@ -101,83 +105,95 @@ export default function ContactsPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Контакты</h1>
-        </div>
-        <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-          <span className="ml-2">Загрузка контактов...</span>
+      <div className="min-h-screen bg-slate-900">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold text-white">Контакты</h1>
+              </div>
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                <span className="ml-2 text-slate-300">Загрузка контактов...</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Контакты</h1>
-        <Link
-          href="/dashboard/contacts/add"
-          className="inline-flex items-center gap-2 text-sm border border-slate-300 dark:border-slate-700 px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
-        >
-          <Plus className="w-4 h-4" />
-          Добавить
-        </Link>
-      </div>
-
-      <input
-        type="text"
-        placeholder="Поиск контактов..."
-        className="w-full border border-slate-300 dark:border-slate-700 rounded-md px-4 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-
-      {error && (
-        <div className="p-4 border border-red-300 dark:border-red-700 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400">
-          {error}
-        </div>
-      )}
-
-      {filtered.length === 0 && !isLoading ? (
-        <div className="text-center py-8 text-slate-500">
-          {search ? 'Контакты не найдены' : 'У вас пока нет контактов'}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filtered.map((contact) => (
-            <div
-              key={contact.id}
-              className="flex flex-col items-center gap-3 p-4 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-            >
+    <div className="min-h-screen bg-slate-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold text-white">Контакты</h1>
               <Link
-                href={`/${contact.username}`}
-                className="flex flex-col items-center gap-2 flex-1"
+                href="/dashboard/contacts/add"
+                className="inline-flex items-center gap-2 text-sm border border-slate-600 px-3 py-1.5 rounded-xl hover:bg-slate-700 text-slate-300 transition-colors"
               >
-                <Avatar 
-                  src={contact.avatar_url || null} 
-                  alt={getDisplayName(contact)} 
-                  size={64}
-                />
-                <div className="text-center">
-                  <div className="font-semibold text-sm">{getDisplayName(contact)}</div>
-                  <div className="text-xs text-slate-500">@{contact.username}</div>
-                </div>
+                <Plus className="w-4 h-4" />
+                Добавить
               </Link>
-              
-              <button
-                onClick={() => removeContact(contact.id)}
-                disabled={isRemoving === contact.id}
-                className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                title="Удалить из контактов"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
             </div>
-          ))}
+
+            <input
+              type="text"
+              placeholder="Поиск контактов..."
+              className="w-full border border-slate-600 rounded-lg px-4 py-2 bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+
+            {error && (
+              <div className="p-4 border border-red-700 rounded-lg bg-red-900/20 text-red-400">
+                {error}
+              </div>
+            )}
+
+            {filtered.length === 0 && !isLoading ? (
+              <div className="text-center py-8 text-slate-400">
+                {search ? 'Контакты не найдены' : 'У вас пока нет контактов'}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {filtered.map((contact) => (
+                  <div
+                    key={contact.id}
+                    className="flex flex-col items-center gap-3 p-4 border border-slate-700 rounded-xl hover:bg-slate-800 transition-colors bg-slate-800"
+                  >
+                    <Link
+                      href={`/${contact.username}`}
+                      className="flex flex-col items-center gap-2 flex-1"
+                    >
+                      <Avatar 
+                        src={contact.avatar_url || null} 
+                        alt={getDisplayName(contact)} 
+                        size={64}
+                      />
+                      <div className="text-center">
+                        <div className="font-semibold text-sm text-white">{getDisplayName(contact)}</div>
+                        <div className="text-xs text-slate-400">@{contact.username}</div>
+                      </div>
+                    </Link>
+                    
+                    <button
+                      onClick={() => removeContact(contact.id)}
+                      disabled={isRemoving === contact.id}
+                      className="text-red-400 hover:text-red-300 p-1 rounded hover:bg-red-900/20 transition-colors"
+                      title="Удалить из контактов"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
