@@ -1,4 +1,4 @@
-# HumanDNS - Living Address Book
+# One ID - Living Address Book
 
  **Backend (FastAPI)**
 ```bash
