@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { getToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { useI18n } from "@/components/I18nProvider";
 import { api } from "@/lib/api";
 import Avatar from "@/components/Avatar";
 
@@ -43,7 +42,6 @@ export default function AddContactPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const token = getToken();
-  const { t } = useI18n();
 
   useEffect(() => {
     if (!token) {
@@ -109,12 +107,12 @@ export default function AddContactPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">{t("add_contact_title")}</h1>
+      <h1 className="text-2xl font-bold">Добавить контакт</h1>
 
       <div className="flex gap-2">
         <input
           type="text"
-          placeholder={t("add_contact_search_placeholder")}
+          placeholder="Введите имя пользователя..."
           className="flex-1 border border-slate-300 dark:border-slate-700 rounded-md px-4 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -125,7 +123,7 @@ export default function AddContactPage() {
           disabled={isSearching || query.trim().length < 2}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSearching ? "Поиск..." : t("add_contact_search")}
+          {isSearching ? "Поиск..." : "Найти"}
         </button>
       </div>
 
@@ -170,13 +168,13 @@ export default function AddContactPage() {
 
       {query.trim().length >= 2 && searchResults.length === 0 && !isSearching && !error && (
         <div className="p-4 border border-slate-200 dark:border-slate-700 rounded-md text-center text-slate-500">
-          {t("add_contact_user_not_found")}
+          Пользователь не найден
         </div>
       )}
 
       <div>
         <Link href="/dashboard/contacts" className="text-sm text-blue-600 hover:underline">
-          {t("add_contact_back")}
+          ← Назад к контактам
         </Link>
       </div>
     </div>

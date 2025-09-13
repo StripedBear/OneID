@@ -5,7 +5,6 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { getToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { useI18n } from "@/components/I18nProvider";
 import { api } from "@/lib/api";
 import Avatar from "@/components/Avatar";
 
@@ -45,7 +44,6 @@ export default function ContactsPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const token = getToken();
-  const { t } = useI18n();
 
   const loadContacts = useCallback(async () => {
     if (!token) return;
@@ -105,7 +103,7 @@ export default function ContactsPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">{t("contacts_title")}</h1>
+          <h1 className="text-2xl font-bold">Контакты</h1>
         </div>
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
@@ -118,19 +116,19 @@ export default function ContactsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t("contacts_title")}</h1>
+        <h1 className="text-2xl font-bold">Контакты</h1>
         <Link
           href="/dashboard/contacts/add"
           className="inline-flex items-center gap-2 text-sm border border-slate-300 dark:border-slate-700 px-3 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
         >
           <Plus className="w-4 h-4" />
-          {t("contacts_add")}
+          Добавить
         </Link>
       </div>
 
       <input
         type="text"
-        placeholder={t("contacts_search_placeholder")}
+        placeholder="Поиск контактов..."
         className="w-full border border-slate-300 dark:border-slate-700 rounded-md px-4 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
