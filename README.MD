@@ -1,28 +1,75 @@
 # OneID - Living Address Book
 
- **Backend (FastAPI)**
+A modern contact management system that allows users to create public profiles with their contact channels.
+
+## 🚀 Live Demo
+
+- **Frontend**: https://oneid-frontend.vercel.app
+- **Backend API**: https://oneid-m4s5.onrender.com
+- **API Documentation**: https://oneid-m4s5.onrender.com/docs
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 14, React 18, TailwindCSS, TypeScript
+- **Backend**: FastAPI, Python 3.11, SQLAlchemy, Alembic
+- **Database**: PostgreSQL (Supabase)
+- **Storage**: Supabase Storage
+- **Deployment**: Vercel (Frontend), Render (Backend)
+
+## 🏃‍♂️ Quick Start
+
+### Prerequisites
+- Node.js 18+
+- Python 3.11+
+- Git
+
+### Backend Setup
 ```bash
 cd backend
 python3 -m venv venv
 source venv/bin/activate   # Windows: venv\Scripts\activate
 
-# Install dependencies including new image processing libraries
+# Install dependencies
 pip install -r requirements.txt
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your database URL
+
+# Run migrations
+alembic upgrade head
 
 # Start server
 uvicorn app.main:app --reload
 ```
 
- Server will start on http://localhost:8000
-
- **Frontend (Next.js + TailwindCSS)**
+### Frontend Setup
 ```bash
 cd frontend
 npm install
+
+# Set up environment variables
+cp env.example .env.local
+# Edit .env.local with your API URL
+
+# Start development server
 npm run dev
 ```
 
- Client will be available on http://localhost:3000
+### Environment Variables
+
+**Backend (.env)**:
+```bash
+DATABASE_URL=postgresql://user:password@host:port/database
+SECRET_KEY=your-secret-key
+CORS_ORIGINS=["http://localhost:3000","https://your-frontend-domain.com"]
+```
+
+**Frontend (.env.local)**:
+```bash
+NEXT_PUBLIC_API_BASE_URL=https://oneid-m4s5.onrender.com/api/v1
+NEXT_PUBLIC_FRONTEND_URL=https://oneid-frontend.vercel.app
+```
 
 ##  New Features
 
