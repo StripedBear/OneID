@@ -12,7 +12,8 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "lucide-react": "^0.263.1",
-    "react-qr-code": "^2.0.12"
+    "react-qr-code": "^2.0.12",
+    "next-themes": "^0.2.1"
   },
   "devDependencies": {
     "@types/node": "^20",
