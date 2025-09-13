@@ -9,9 +9,6 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    outputFileTracingRoot: undefined,
-  },
   trailingSlash: false,
   generateEtags: false,
   poweredByHeader: false,
