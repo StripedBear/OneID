@@ -96,8 +96,7 @@ export default function UserProfile({ params }: UserProfileProps) {
             
             <div className="mb-6">
               <CopyButton 
-                text={`${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/${user.username}`}
-                label="Скопировать ссылку"
+                value={`${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/${user.username}`}
               />
             </div>
             
@@ -115,7 +114,7 @@ export default function UserProfile({ params }: UserProfileProps) {
                         {channel.value}
                       </div>
                     </div>
-                    <CopyButton text={channel.value} label="Скопировать" />
+                    <CopyButton value={channel.value} />
                   </div>
                 ))}
               </div>
