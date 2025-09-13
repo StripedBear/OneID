@@ -51,3 +51,4 @@ def test_user_data():
         "first_name": "Test",
         "last_name": "User"
     }
+

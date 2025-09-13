@@ -1,67 +1,61 @@
-"use client";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { api } from "@/lib/api";
-import { useI18n } from "@/components/I18nProvider";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-
-const schema = z.object({
-  email: z.string().email(),
-  username: z.string().min(3).max(50),
-  password: z.string().min(8).max(128),
-  display_name: z.string().optional(),
-  avatar_url: z.string().url().optional().or(z.literal("")),
-  bio: z.string().optional(),
-});
-
-type FormData = z.infer<typeof schema>;
-
 export default function RegisterPage() {
-  const { t } = useI18n();
-  const router = useRouter();
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
-    resolver: zodResolver(schema)
-  });
-  const [error, setError] = useState<string | null>(null);
-
-  const onSubmit = async (values: FormData) => {
-    setError(null);
-    try {
-      await api("/auth/register", { method: "POST", body: JSON.stringify(values) });
-      router.push("/login");
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Registration error");
-    }
-  };
-
   return (
-    <div className="max-w-md mx-auto grid gap-4">
-      <h1 className="text-2xl font-semibold">{t("register_title")}</h1>
-      {error && <div className="text-red-400 text-sm">{error}</div>}
-      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-3">
-        <input placeholder={t("register_email")} className="input" {...register("email")} />
-        {errors.email && <p className="err">{errors.email.message}</p>}
-
-        <input placeholder={t("register_username")} className="input" {...register("username")} />
-        {errors.username && <p className="err">{errors.username.message}</p>}
-
-        <input placeholder={t("register_display_name")} className="input" {...register("display_name")} />
-        <input placeholder={t("register_avatar_url")} className="input" {...register("avatar_url")} />
-        <textarea placeholder={t("register_bio")} className="input" rows={3} {...register("bio")} />
-
-        <input placeholder={t("register_password")} type="password" className="input" {...register("password")} />
-        {errors.password && <p className="err">{errors.password.message}</p>}
-
-        <button disabled={isSubmitting} className="btn-primary">{isSubmitting ? "Creating..." : t("register_submit")}</button>
-      </form>
-
-      <style jsx>{`
-        .input { background:#0b1220; border:1px solid #1f2937; border-radius:14px; padding:10px 14px; }
-        .btn-primary { background:white; color:#0b1220; border-radius:14px; padding:10px 14px; }
-        .err { color:#fda4af; font-size:12px; }
-      `}</style>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
+        <h1 className="text-2xl font-bold text-center mb-6">Sign Up</h1>
+        
+        <form className="space-y-4">
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Create Account
+          </button>
+        </form>
+        
+        <p className="text-center text-sm text-gray-600 mt-4">
+          Already have an account?{" "}
+          <a href="/login" className="text-blue-600 hover:underline">
+            Sign in
+          </a>
+        </p>
+      </div>
     </div>
   );
 }

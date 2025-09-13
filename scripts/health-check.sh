@@ -138,3 +138,4 @@ else
     echo -e "${RED}❌ Some services are unhealthy. Please check the logs.${NC}"
     exit 1
 fi
+

@@ -31,3 +31,4 @@ describe('Avatar Component', () => {
     expect(avatar).toHaveAttribute('alt', alt);
   });
 });
+

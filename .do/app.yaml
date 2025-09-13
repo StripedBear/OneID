@@ -1,0 +1,49 @@
+# DigitalOcean App Platform configuration for HumanDNS
+name: humandns
+services:
+- name: backend
+  source_dir: backend
+  github:
+    repo: your-username/humandns
+    branch: main
+  run_command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 8000
+  health_check:
+    http_path: /health
+  envs:
+  - key: DATABASE_URL
+    scope: RUN_TIME
+    value: ${db.DATABASE_URL}
+  - key: SECRET_KEY
+    scope: RUN_TIME
+    value: ${SECRET_KEY}
+  - key: CORS_ORIGINS
+    scope: RUN_TIME
+    value: '["https://humandns-frontend.ondigitalocean.app"]'
+
+- name: frontend
+  source_dir: frontend
+  github:
+    repo: your-username/humandns
+    branch: main
+  run_command: npm start
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 3000
+  envs:
+  - key: NEXT_PUBLIC_API_URL
+    scope: RUN_TIME
+    value: https://humandns-backend.ondigitalocean.app
+
+databases:
+- name: db
+  engine: PG
+  version: "15"
+  size: db-s-1vcpu-1gb
+  num_nodes: 1
+
+

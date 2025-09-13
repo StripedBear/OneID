@@ -29,3 +29,4 @@ def test_openapi_schema(client: TestClient):
     data = response.json()
     assert "openapi" in data
     assert data["info"]["title"] == "HumanDNS API"
+

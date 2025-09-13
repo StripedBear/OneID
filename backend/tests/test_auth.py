@@ -68,3 +68,4 @@ def test_get_current_user_invalid_token(client: TestClient):
     headers = {"Authorization": "Bearer invalid_token"}
     response = client.get("/api/v1/auth/me", headers=headers)
     assert response.status_code == 401
+

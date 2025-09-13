@@ -1,0 +1,35 @@
+name: Health Check
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+
+jobs:
+  # Basic health check
+  health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check backend health
+      run: |
+        response=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.BACKEND_URL }}/health)
+        if [ $response -eq 200 ]; then
+          echo "✅ Backend is healthy"
+        else
+          echo "❌ Backend is unhealthy (HTTP $response)"
+          exit 1
+        fi
+
+    - name: Check frontend health
+      run: |
+        response=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.FRONTEND_URL }})
+        if [ $response -eq 200 ]; then
+          echo "✅ Frontend is healthy"
+        else
+          echo "❌ Frontend is unhealthy (HTTP $response)"
+          exit 1
+        fi
