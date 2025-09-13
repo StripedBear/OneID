@@ -4,7 +4,7 @@ import Link from "next/link";
 import NavLinks from "@/components/NavLinks";
 
 export const metadata: Metadata = {
-  title: "HumanDNS - Living Address Book",
+  title: "OneID - Living Address Book",
   description: "Current communication channels by permanent link",
 };
 
@@ -15,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="border-b border-slate-700">
           <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
             <Link href="/" className="text-xl font-bold text-white">
-              HumanDNS
+              OneID
             </Link>
             <NavLinks />
           </div>
@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </main>
         <footer className="mx-auto max-w-5xl px-4 py-8 text-sm text-slate-400">
-          © {new Date().getFullYear()} HumanDNS
+          © {new Date().getFullYear()} OneID
         </footer>
       </body>
     </html>

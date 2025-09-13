@@ -37,7 +37,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center">
       <div className="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl p-8">
-        <h1 className="text-2xl font-bold text-center mb-6">Регистрация</h1>
+        <h1 className="text-2xl font-bold text-center mb-6">Sign Up</h1>
         
         {error && (
           <div className="mb-4 p-3 bg-red-900/20 border border-red-700 rounded-lg text-red-400 text-sm">
@@ -48,7 +48,7 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-slate-300 mb-1">
-              Имя пользователя
+              Username
             </label>
             <input
               type="text"
@@ -76,7 +76,7 @@ export default function RegisterPage() {
           
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1">
-              Пароль
+              Password
             </label>
             <input
               type="password"
@@ -93,14 +93,14 @@ export default function RegisterPage() {
             disabled={isLoading}
             className="w-full bg-white text-slate-900 py-2 px-4 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50"
           >
-            {isLoading ? "Регистрация..." : "Создать аккаунт"}
+            {isLoading ? "Signing up..." : "Create Account"}
           </button>
         </form>
         
         <p className="text-center text-sm text-slate-400 mt-4">
-          Уже есть аккаунт?{" "}
+          Already have an account?{" "}
           <Link href="/login" className="text-blue-400 hover:text-blue-300 underline">
-            Войти
+            Log in
           </Link>
         </p>
       </div>

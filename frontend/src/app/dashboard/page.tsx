@@ -133,7 +133,7 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-slate-300">Загрузка...</p>
+          <p className="text-slate-300">Loading...</p>
         </div>
       </div>
     );
@@ -143,8 +143,8 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="mb-4 text-slate-300">Вы не вошли в систему.</p>
-          <Link className="underline text-blue-400 hover:text-blue-300" href="/login">Перейти на страницу входа</Link>
+          <p className="mb-4 text-slate-300">You are not logged in.</p>
+          <Link className="underline text-blue-400 hover:text-blue-300" href="/login">Go to login page</Link>
         </div>
       </div>
     );
@@ -179,7 +179,7 @@ export default function DashboardPage() {
                 <div className="text-slate-400 text-sm">{user?.email}</div>
                 {user && (
                   <div className="text-sm mt-2 text-slate-300">
-                    Публичный профиль:{" "}
+                    Public profile:{" "}
                     <Link className="underline text-blue-400 hover:text-blue-300" href={`/${user.username}`} target="_blank" rel="noreferrer">
                       /{user.username}
                     </Link>
@@ -189,7 +189,7 @@ export default function DashboardPage() {
                   onClick={() => setShowProfileEdit(true)}
                   className="mt-3 text-sm text-blue-400 hover:text-blue-300 underline"
                 >
-                  Редактировать профиль
+                  Edit Profile
                 </button>
               </div>
             </div>
@@ -197,7 +197,7 @@ export default function DashboardPage() {
             {error && <div className="text-red-400 text-sm bg-red-900/20 border border-red-700 rounded-lg p-3">{error}</div>}
 
             <section className="grid gap-3">
-              <h2 className="text-lg font-semibold text-white">Мои каналы</h2>
+              <h2 className="text-lg font-semibold text-white">My Channels</h2>
               <ul className="grid gap-2">
                 {channels.map((ch) => (
                   <li key={ch.id} className="flex items-center gap-3 border border-slate-700 rounded-2xl p-3 bg-slate-800">
@@ -206,7 +206,7 @@ export default function DashboardPage() {
                       <div className="font-medium text-white">{ch.label || ch.type}</div>
                       <div className="text-sm text-slate-400 break-all">{ch.value}</div>
                       <div className="text-xs text-slate-500">
-                        {ch.is_public ? "Публичный" : "Скрытый"} {ch.is_primary ? "• Основной" : ""} • Порядок: {ch.sort_order}
+                        {ch.is_public ? "Public" : "Private"} {ch.is_primary ? "• Primary" : ""} • Order: {ch.sort_order}
                       </div>
                     </div>
                     <button
@@ -214,16 +214,16 @@ export default function DashboardPage() {
                       className="text-sm border border-slate-600 px-3 py-1 rounded-xl hover:bg-slate-700 text-slate-300"
                       disabled={busy}
                     >
-                      Удалить
+                      Delete
                     </button>
                   </li>
                 ))}
-                {channels.length === 0 && <li className="text-slate-400">Пока нет каналов</li>}
+                {channels.length === 0 && <li className="text-slate-400">No channels yet</li>}
               </ul>
             </section>
 
             <section className="grid gap-3">
-              <h2 className="text-lg font-semibold text-white">Добавить канал</h2>
+              <h2 className="text-lg font-semibold text-white">Add Channel</h2>
               <ChannelForm onSubmit={addChannel} disabled={busy} />
             </section>
 
@@ -293,35 +293,35 @@ function ChannelForm({ onSubmit, disabled }: { onSubmit: (v: NewChannel) => void
       </select>
       <input 
         className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-        placeholder="Значение (телефон, @handle, URL…)" 
+        placeholder="Value (phone, @handle, URL…)" 
         value={form.value} 
         onChange={(e)=>setForm({...form, value:e.target.value})} 
       />
       <input 
         className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-        placeholder="Метка (опц.)" 
+        placeholder="Label (optional)" 
         value={form.label} 
         onChange={(e)=>setForm({...form, label:e.target.value})} 
       />
       <input 
         className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
         type="number" 
-        placeholder="Порядок" 
+        placeholder="Order" 
         value={form.sort_order} 
         onChange={(e)=>setForm({...form, sort_order:Number(e.target.value)})} 
       />
       <label className="flex items-center gap-2 text-sm text-slate-300">
-        <input type="checkbox" checked={form.is_public} onChange={(e)=>setForm({...form, is_public:e.target.checked})} /> Публичный
+        <input type="checkbox" checked={form.is_public} onChange={(e)=>setForm({...form, is_public:e.target.checked})} /> Public
       </label>
       <label className="flex items-center gap-2 text-sm text-slate-300">
-        <input type="checkbox" checked={form.is_primary} onChange={(e)=>setForm({...form, is_primary:e.target.checked})} /> Основной
+        <input type="checkbox" checked={form.is_primary} onChange={(e)=>setForm({...form, is_primary:e.target.checked})} /> Primary
       </label>
       <div className="md:col-span-2">
         <button 
           disabled={disabled} 
           className="w-full bg-white text-slate-900 py-2 px-4 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50"
         >
-          {disabled ? "Сохраняю..." : "Добавить"}
+          {disabled ? "Saving..." : "Add"}
         </button>
       </div>
     </form>
@@ -351,48 +351,48 @@ function ProfileEditForm({
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-4 text-center text-white">Редактировать профиль</h2>
+      <h2 className="text-xl font-semibold mb-4 text-center text-white">Edit Profile</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium mb-2 text-slate-300">Имя</label>
+          <label className="block text-sm font-medium mb-2 text-slate-300">First Name</label>
           <input
             type="text"
             value={form.first_name}
             onChange={(e) => setForm({...form, first_name: e.target.value})}
             className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Введите имя"
+            placeholder="Enter first name"
           />
         </div>
         
         <div>
-          <label className="block text-sm font-medium mb-2 text-slate-300">Фамилия</label>
+          <label className="block text-sm font-medium mb-2 text-slate-300">Last Name</label>
           <input
             type="text"
             value={form.last_name}
             onChange={(e) => setForm({...form, last_name: e.target.value})}
             className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Введите фамилию"
+            placeholder="Enter last name"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2 text-slate-300">Отображаемое имя (опционально)</label>
+          <label className="block text-sm font-medium mb-2 text-slate-300">Display Name (optional)</label>
           <input
             type="text"
             value={form.display_name}
             onChange={(e) => setForm({...form, display_name: e.target.value})}
             className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Введите отображаемое имя"
+            placeholder="Enter display name"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2 text-slate-300">О себе (опционально)</label>
+          <label className="block text-sm font-medium mb-2 text-slate-300">Bio (optional)</label>
           <textarea
             value={form.bio}
             onChange={(e) => setForm({...form, bio: e.target.value})}
             className="w-full px-3 py-2 border border-slate-600 rounded-lg bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Расскажите о себе"
+            placeholder="Tell us about yourself"
             rows={3}
           />
         </div>
@@ -403,13 +403,13 @@ function ProfileEditForm({
             onClick={onCancel}
             className="flex-1 px-4 py-2 border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-700 transition-colors"
           >
-            Отмена
+            Cancel
           </button>
           <button
             type="submit"
             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Сохранить
+            Save
           </button>
         </div>
       </form>

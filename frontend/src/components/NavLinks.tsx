@@ -22,16 +22,16 @@ export default function NavLinks() {
     <>
       {/* Desktop Menu */}
       <nav className="hidden md:flex text-sm items-center gap-4">
-        {!hasToken && <Link href="/login" className="hover:underline">Войти</Link>}
-        {!hasToken && <Link href="/register" className="hover:underline">Регистрация</Link>}
-        {hasToken && <Link href="/dashboard" className="hover:underline">Панель</Link>}
-        {hasToken && <Link href="/dashboard/contacts" className="hover:underline">Контакты</Link>}
+        {!hasToken && <Link href="/login" className="hover:underline">Login</Link>}
+        {!hasToken && <Link href="/register" className="hover:underline">Sign Up</Link>}
+        {hasToken && <Link href="/dashboard" className="hover:underline">Dashboard</Link>}
+        {hasToken && <Link href="/dashboard/contacts" className="hover:underline">Contacts</Link>}
         {hasToken && (
           <button
             onClick={handleLogout}
             className="text-sm border border-slate-700 px-3 py-1 rounded-xl hover:bg-slate-800"
           >
-            Выйти
+            Logout
           </button>
         )}
       </nav>
@@ -59,26 +59,26 @@ export default function NavLinks() {
               {!hasToken && (
                 <>
                   <Link href="/login" className="text-lg hover:text-blue-400" onClick={() => setIsMobileMenuOpen(false)}>
-                    Войти
+                    Login
                   </Link>
                   <Link href="/register" className="text-lg hover:text-blue-400" onClick={() => setIsMobileMenuOpen(false)}>
-                    Регистрация
+                    Sign Up
                   </Link>
                 </>
               )}
               {hasToken && (
                 <>
                   <Link href="/dashboard" className="text-lg hover:text-blue-400" onClick={() => setIsMobileMenuOpen(false)}>
-                    Панель
+                    Dashboard
                   </Link>
                   <Link href="/dashboard/contacts" className="text-lg hover:text-blue-400" onClick={() => setIsMobileMenuOpen(false)}>
-                    Контакты
+                    Contacts
                   </Link>
                   <button
                     onClick={handleLogout}
                     className="text-lg text-left hover:text-red-400 border-t border-slate-700 pt-4"
                   >
-                    Выйти
+                    Logout
                   </button>
                 </>
               )}

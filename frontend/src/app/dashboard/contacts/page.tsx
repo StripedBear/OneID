@@ -89,8 +89,8 @@ export default function ContactsPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <p className="mb-4 text-slate-300">Вы не вошли в систему.</p>
-          <Link className="underline text-blue-400 hover:text-blue-300" href="/login">Перейти на страницу входа</Link>
+          <p className="mb-4 text-slate-300">You are not logged in.</p>
+          <Link className="underline text-blue-400 hover:text-blue-300" href="/login">Go to login page</Link>
         </div>
       </div>
     );
@@ -110,11 +110,11 @@ export default function ContactsPage() {
           <div className="max-w-6xl mx-auto">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-white">Контакты</h1>
+                <h1 className="text-2xl font-bold text-white">Contacts</h1>
               </div>
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-                <span className="ml-2 text-slate-300">Загрузка контактов...</span>
+                <span className="ml-2 text-slate-300">Loading contacts...</span>
               </div>
             </div>
           </div>
@@ -129,19 +129,19 @@ export default function ContactsPage() {
         <div className="max-w-6xl mx-auto">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold text-white">Контакты</h1>
+              <h1 className="text-2xl font-bold text-white">Contacts</h1>
               <Link
                 href="/dashboard/contacts/add"
                 className="inline-flex items-center gap-2 text-sm border border-slate-600 px-3 py-1.5 rounded-xl hover:bg-slate-700 text-slate-300 transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                Добавить
+                Add
               </Link>
             </div>
 
             <input
               type="text"
-              placeholder="Поиск контактов..."
+              placeholder="Search contacts..."
               className="w-full border border-slate-600 rounded-lg px-4 py-2 bg-slate-700 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -155,7 +155,7 @@ export default function ContactsPage() {
 
             {filtered.length === 0 && !isLoading ? (
               <div className="text-center py-8 text-slate-400">
-                {search ? 'Контакты не найдены' : 'У вас пока нет контактов'}
+                {search ? 'No contacts found' : 'You have no contacts yet'}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -183,7 +183,7 @@ export default function ContactsPage() {
                       onClick={() => removeContact(contact.id)}
                       disabled={isRemoving === contact.id}
                       className="text-red-400 hover:text-red-300 p-1 rounded hover:bg-red-900/20 transition-colors"
-                      title="Удалить из контактов"
+                      title="Remove from contacts"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

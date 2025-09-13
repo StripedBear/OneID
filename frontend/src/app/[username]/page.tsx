@@ -56,7 +56,7 @@ export default function UserProfile({ params }: UserProfileProps) {
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-slate-300">Загрузка профиля...</p>
+          <p className="text-slate-300">Loading profile...</p>
         </div>
       </div>
     );
@@ -66,8 +66,8 @@ export default function UserProfile({ params }: UserProfileProps) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Профиль не найден</h1>
-          <p className="text-slate-300">Пользователь @{username} не существует</p>
+          <h1 className="text-2xl font-bold text-white mb-4">Profile not found</h1>
+          <p className="text-slate-300">User @{username} does not exist</p>
         </div>
       </div>
     );
@@ -102,7 +102,7 @@ export default function UserProfile({ params }: UserProfileProps) {
             
             {publicChannels.length > 0 ? (
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-white mb-4">Каналы связи</h2>
+                <h2 className="text-xl font-semibold text-white mb-4">Contact Channels</h2>
                 {publicChannels.map((channel) => (
                   <div key={channel.id} className="flex items-center gap-3 border border-slate-700 rounded-xl p-4 hover:bg-slate-700/50 transition-colors">
                     <ChannelIcon type={channel.type} />
@@ -120,7 +120,7 @@ export default function UserProfile({ params }: UserProfileProps) {
               </div>
             ) : (
               <div className="text-slate-400">
-                <p>У пользователя пока нет публичных каналов связи</p>
+                <p>User has no public contact channels yet</p>
               </div>
             )}
           </div>
