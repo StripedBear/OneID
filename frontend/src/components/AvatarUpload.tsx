@@ -4,7 +4,6 @@ import React, { useState, useCallback, useEffect } from "react";
 import { Upload, X, User } from "lucide-react";
 import { api } from "@/lib/api";
 import { getToken } from "@/lib/auth";
-import { useI18n } from "@/components/I18nProvider";
 
 // Helper function to convert relative URLs to absolute backend URLs
 const getFullAvatarUrl = (avatarUrl: string | null): string | null => {
@@ -31,7 +30,6 @@ export default function AvatarUpload({
   onAvatarUpdate, 
   size = "md" 
 }: AvatarUploadProps) {
-  const { t } = useI18n();
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,13 +44,13 @@ export default function AvatarUpload({
   const uploadFile = async (file: File) => {
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      setError(t('avatar_upload_error_file_type'));
+      setError('Пожалуйста, выберите изображение');
       return;
     }
 
     // Validate file size (5MB limit)
     if (file.size > 5 * 1024 * 1024) {
-      setError(t('avatar_upload_error_file_size'));
+      setError('Файл слишком большой (максимум 5MB)');
       return;
     }
 
@@ -87,7 +85,7 @@ export default function AvatarUpload({
       onAvatarUpdate(response.avatar_url);
     } catch (err) {
       console.error('Upload error:', err);
-      setError(err instanceof Error ? err.message : t('avatar_upload_error_upload_failed'));
+      setError(err instanceof Error ? err.message : 'Ошибка загрузки');
     } finally {
       setIsUploading(false);
     }
@@ -110,7 +108,7 @@ export default function AvatarUpload({
       onAvatarUpdate(response.avatar_url);
     } catch (err) {
       console.error('Remove avatar error:', err);
-      setError(err instanceof Error ? err.message : t('avatar_upload_error_remove_failed'));
+      setError(err instanceof Error ? err.message : 'Ошибка удаления');
     }
   };
 
@@ -179,7 +177,7 @@ export default function AvatarUpload({
           <div 
             className="cursor-pointer hover:opacity-80 transition-opacity"
             onClick={openAvatarModal}
-            title={t('avatar_upload_click_to_view')}
+            title="Нажмите для просмотра"
           >
             <img
               src={getFullAvatarUrl(currentAvatarUrl) || ''}
@@ -198,7 +196,7 @@ export default function AvatarUpload({
           <button
             onClick={removeAvatar}
             className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 z-10"
-            title={t('avatar_upload_remove_tooltip')}
+            title="Удалить аватар"
           >
             <X className="w-3 h-3" />
           </button>
@@ -232,21 +230,14 @@ export default function AvatarUpload({
           <Upload className={`w-6 h-6 ${isDragOver ? 'text-blue-500' : 'text-slate-400'}`} />
           <div className="text-sm">
             {isUploading ? (
-              <span className="text-blue-500">{t('avatar_upload_uploading')}</span>
+              <span className="text-blue-500">Загрузка...</span>
             ) : (
               <>
                 <span className="text-slate-600 dark:text-slate-400">
-                  {t('avatar_upload_drop_text').split('click to browse').map((part, i) => 
-                    i === 0 ? part : (
-                      <span key={i}>
-                        <span className="text-blue-500 underline">click to browse</span>
-                        {part}
-                      </span>
-                    )
-                  )}
+                  Перетащите изображение сюда или <span className="text-blue-500 underline">выберите файл</span>
                 </span>
                 <div className="text-xs text-slate-500 mt-1">
-                  {t('avatar_upload_supported_formats')}
+                  PNG, JPG, GIF до 5MB
                 </div>
               </>
             )}
@@ -275,7 +266,7 @@ export default function AvatarUpload({
             <button
               onClick={closeAvatarModal}
               className="absolute top-4 right-4 w-10 h-10 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition-colors z-10"
-              title={t('avatar_upload_close_modal')}
+              title="Закрыть"
             >
               <X className="w-5 h-5" />
             </button>
@@ -292,7 +283,7 @@ export default function AvatarUpload({
             {/* Modal footer */}
             <div className="px-8 pb-6 text-center">
               <p className="text-slate-600 dark:text-slate-400 text-sm">
-                {t('avatar_upload_modal_description')}
+                Нажмите на изображение для увеличения
               </p>
             </div>
           </div>
