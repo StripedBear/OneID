@@ -10,6 +10,8 @@ class UserRegister(BaseModel):
     email: EmailStr
     username: str = Field(min_length=3, max_length=50)
     password: str = Field(min_length=8, max_length=128)
+    first_name: str | None = None
+    last_name: str | None = None
     display_name: str | None = None
     avatar_url: str | None = None
     bio: str | None = None
