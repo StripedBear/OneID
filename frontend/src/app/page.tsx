@@ -3,12 +3,35 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <div className="min-h-screen text-white bg-slate-900 relative overflow-hidden">
-      {/* Animated gradient circles */}
+      {/* Animated grid with pulsing connections */}
       <div className="absolute inset-0">
-        <div className="gradient-circle-1"></div>
-        <div className="gradient-circle-2"></div>
-        <div className="gradient-circle-3"></div>
-        <div className="gradient-circle-4"></div>
+        <div className="grid-overlay">
+          <div className="grid-lines"></div>
+          <div className="grid-nodes">
+            <div className="node node-1"></div>
+            <div className="node node-2"></div>
+            <div className="node node-3"></div>
+            <div className="node node-4"></div>
+            <div className="node node-5"></div>
+            <div className="node node-6"></div>
+            <div className="node node-7"></div>
+            <div className="node node-8"></div>
+            <div className="node node-9"></div>
+            <div className="node node-10"></div>
+            <div className="node node-11"></div>
+            <div className="node node-12"></div>
+          </div>
+          <div className="grid-connections">
+            <div className="connection connection-1"></div>
+            <div className="connection connection-2"></div>
+            <div className="connection connection-3"></div>
+            <div className="connection connection-4"></div>
+            <div className="connection connection-5"></div>
+            <div className="connection connection-6"></div>
+            <div className="connection connection-7"></div>
+            <div className="connection connection-8"></div>
+          </div>
+        </div>
       </div>
       
       <div className="relative z-10">
