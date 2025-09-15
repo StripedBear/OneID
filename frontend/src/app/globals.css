@@ -9,3 +9,70 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Vintage Background Styles */
+.vintage-bg {
+  background: linear-gradient(135deg, #8b4513 0%, #d2691e 25%, #cd853f 50%, #f4a460 75%, #daa520 100%);
+  background-size: 400% 400%;
+  animation: vintage-gradient 15s ease infinite;
+}
+
+@keyframes vintage-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Vintage Pattern 1 - Geometric shapes */
+.vintage-pattern-1 {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.3) 2px, transparent 2px),
+    radial-gradient(circle at 75% 75%, rgba(255, 140, 0, 0.2) 1px, transparent 1px);
+  background-size: 60px 60px, 40px 40px;
+  animation: vintage-float 20s linear infinite;
+}
+
+/* Vintage Pattern 2 - Diagonal lines */
+.vintage-pattern-2 {
+  background-image: 
+    linear-gradient(45deg, rgba(139, 69, 19, 0.1) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(210, 105, 30, 0.1) 25%, transparent 25%);
+  background-size: 80px 80px;
+  animation: vintage-drift 25s linear infinite reverse;
+}
+
+/* Vintage Pattern 3 - Dots pattern */
+.vintage-pattern-3 {
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(255, 165, 0, 0.15) 1px, transparent 1px);
+  background-size: 30px 30px;
+  animation: vintage-pulse 18s ease-in-out infinite;
+}
+
+@keyframes vintage-float {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(30px, -30px) rotate(120deg); }
+  66% { transform: translate(-20px, 20px) rotate(240deg); }
+  100% { transform: translate(0, 0) rotate(360deg); }
+}
+
+@keyframes vintage-drift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(80px); }
+}
+
+@keyframes vintage-pulse {
+  0%, 100% { opacity: 0.1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.1); }
+}
+
+/* Vintage Glow Effect */
+.vintage-glow {
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(139, 69, 19, 0.1) 70%);
+  animation: vintage-glow-pulse 12s ease-in-out infinite;
+}
+
+@keyframes vintage-glow-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}

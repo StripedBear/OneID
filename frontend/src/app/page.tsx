@@ -1,24 +1,23 @@
 import Link from "next/link";
 
 export default function HomePage() {
-  // Background image configuration
-  const backgroundImagePath = "/images/background.jpg";
-  
-  // Try to load the background image
-  const backgroundStyle = {
-    backgroundImage: `url(${backgroundImagePath})`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-  };
-
   return (
-    <div 
-      className="min-h-screen text-white bg-slate-900"
-      style={backgroundStyle}
-    >
-      {/* Dark overlay for better text readability when using background image */}
-      <div className="absolute inset-0 bg-black/50"></div>
+    <div className="min-h-screen text-white relative overflow-hidden">
+      {/* Vintage animated background */}
+      <div className="absolute inset-0 vintage-bg">
+        {/* Animated geometric patterns */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="vintage-pattern-1"></div>
+          <div className="vintage-pattern-2"></div>
+          <div className="vintage-pattern-3"></div>
+        </div>
+        
+        {/* Warm gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-900/80 via-orange-800/70 to-red-900/80"></div>
+        
+        {/* Subtle animation overlay */}
+        <div className="absolute inset-0 vintage-glow"></div>
+      </div>
       
       <div className="relative z-10">
       <div className="container mx-auto px-4 py-16">
