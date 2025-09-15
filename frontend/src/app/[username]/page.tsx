@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { PublicProfile } from "@/types";
-import { ChannelIcon } from "@/components/ChannelIcon";
 import Avatar from "@/components/Avatar";
 import CopyButton from "@/components/CopyButton";
+import SocialChannel from "@/components/SocialChannel";
 
 interface UserProfileProps {
   params: {
@@ -101,22 +101,13 @@ export default function UserProfile({ params }: UserProfileProps) {
             </div>
             
             {publicChannels.length > 0 ? (
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold text-white mb-4">Contact Channels</h2>
-                {publicChannels.map((channel) => (
-                  <div key={channel.id} className="flex items-center gap-3 border border-slate-700 rounded-xl p-4 hover:bg-slate-700/50 transition-colors">
-                    <ChannelIcon type={channel.type} />
-                    <div className="flex-1">
-                      <div className="font-medium text-white">
-                        {channel.label || channel.type}
-                      </div>
-                      <div className="text-sm text-slate-300 break-all">
-                        {channel.value}
-                      </div>
-                    </div>
-                    <CopyButton value={channel.value} />
-                  </div>
-                ))}
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-white mb-6">Contact Channels</h2>
+                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 justify-items-center">
+                  {publicChannels.map((channel) => (
+                    <SocialChannel key={channel.id} channel={channel} />
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="text-slate-400">

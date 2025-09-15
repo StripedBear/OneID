@@ -15,7 +15,7 @@ const getFullAvatarUrl = (avatarUrl: string | null): string | null => {
   }
   
   // If it's a relative path, prepend backend base URL
-  const backendBase = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+  const backendBase = process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api/v1', '') || "http://localhost:8000";
   return `${backendBase}${avatarUrl}`;
 };
 
