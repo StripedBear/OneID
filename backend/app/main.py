@@ -13,7 +13,7 @@ from app.api.routes import contacts as contacts_routes
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version="0.1.0",
-    description="MVP: Живая записная книжка / DNS для людей",
+    description="MVP: Living Address Book / DNS for People",
 )
 
 # Раздача статических файлов (аватары)
@@ -35,7 +35,7 @@ app.add_middleware(
 # Системный эндпоинт
 @app.get("/health", summary="Health check", tags=["_service"])
 def health() -> JSONResponse:
-    return JSONResponse({"status": "ok", "service": "human-dns", "version": "0.1.0"})
+    return JSONResponse({"status": "ok", "service": "oneid", "version": "0.1.0"})
 
 # API v1 роутер
 api_router = APIRouter(prefix=settings.API_V1_PREFIX)
