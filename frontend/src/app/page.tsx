@@ -1,8 +1,26 @@
 import Link from "next/link";
 
 export default function HomePage() {
+  // Background image configuration
+  const backgroundImagePath = "/images/background.jpg";
+  
+  // Try to load the background image
+  const backgroundStyle = {
+    backgroundImage: `url(${backgroundImagePath})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+  };
+
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
+    <div 
+      className="min-h-screen text-white bg-slate-900"
+      style={backgroundStyle}
+    >
+      {/* Dark overlay for better text readability when using background image */}
+      <div className="absolute inset-0 bg-black/50"></div>
+      
+      <div className="relative z-10">
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl font-bold mb-6">
@@ -47,6 +65,7 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
