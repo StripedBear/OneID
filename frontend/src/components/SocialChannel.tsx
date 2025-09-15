@@ -8,7 +8,7 @@ interface SocialChannelProps {
   channel: {
     id: number;
     type: string;
-    label?: string;
+    label?: string | null;
     value: string;
   };
 }
@@ -59,7 +59,7 @@ const getChannelIcon = (type: string, className: string = "w-6 h-6") => {
 };
 
 // Helper function to get channel display name
-const getChannelDisplayName = (type: string, label?: string): string => {
+const getChannelDisplayName = (type: string, label?: string | null): string => {
   if (label) return label;
   
   const typeMap: Record<string, string> = {
