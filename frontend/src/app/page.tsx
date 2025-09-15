@@ -2,21 +2,13 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen text-white relative overflow-hidden">
-      {/* Vintage animated background */}
-      <div className="absolute inset-0 vintage-bg">
-        {/* Animated geometric patterns */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="vintage-pattern-1"></div>
-          <div className="vintage-pattern-2"></div>
-          <div className="vintage-pattern-3"></div>
-        </div>
-        
-        {/* Warm gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-900/80 via-orange-800/70 to-red-900/80"></div>
-        
-        {/* Subtle animation overlay */}
-        <div className="absolute inset-0 vintage-glow"></div>
+    <div className="min-h-screen text-white bg-slate-900 relative overflow-hidden">
+      {/* Animated gradient circles */}
+      <div className="absolute inset-0">
+        <div className="gradient-circle-1"></div>
+        <div className="gradient-circle-2"></div>
+        <div className="gradient-circle-3"></div>
+        <div className="gradient-circle-4"></div>
       </div>
       
       <div className="relative z-10">
