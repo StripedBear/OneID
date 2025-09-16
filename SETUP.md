@@ -2,7 +2,7 @@
 
 This guide will help you set up HumanDNS for development, testing, and production.
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Docker & Docker Compose
@@ -48,7 +48,7 @@ docker-compose exec backend alembic upgrade head
 - API Documentation: http://localhost:8000/docs
 - Database: localhost:5432
 
-## 🛠️ Development Setup
+##  Development Setup
 
 ### Backend Development
 ```bash

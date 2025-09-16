@@ -7,8 +7,8 @@ class Settings(BaseSettings):
 
     # Database configuration
     DATABASE_URL: str = "sqlite:///./human_dns.db"
-    # PostgreSQL example for production:
-    # postgresql+psycopg://user:password@host:5432/dbname
+    # Supabase PostgreSQL example:
+    # postgresql+psycopg://postgres:[password]@db.[project-ref].supabase.co:5432/postgres
 
     # JWT Configuration
     SECRET_KEY: str = "CHANGE_ME_IN_PRODUCTION"

@@ -1,18 +1,30 @@
-# Настройка Supabase Storage для аватарок
+# Supabase Setup for OneID (Database + Storage)
 
-## 1. Создание проекта в Supabase
+## 1. Creating a Supabase Project
 
-1. Перейдите на [supabase.com](https://supabase.com)
-2. Создайте новый проект
-3. Дождитесь завершения инициализации
+1. Go to [supabase.com](https://supabase.com)
+2. Create a new project
+3. Wait for initialization to complete
 
-## 2. Настройка Storage
+## 2. Database Configuration
 
-1. В панели Supabase перейдите в **Storage**
-2. Создайте новый bucket с именем `avatars`
-3. Настройте политики доступа:
+### Getting Database URL:
+1. Go to **Settings** → **Database**
+2. Copy the **Connection string** (URI)
+3. Replace `[YOUR-PASSWORD]` with your database password
 
-### Политика для загрузки (INSERT):
+Example URL:
+```
+postgresql+psycopg://postgres:[password]@db.abcdefghijklmnop.supabase.co:5432/postgres
+```
+
+## 3. Storage Configuration
+
+1. In Supabase dashboard, go to **Storage**
+2. Create a new bucket named `avatars`
+3. Configure access policies:
+
+### Upload Policy (INSERT):
 ```sql
 CREATE POLICY "Users can upload their own avatars" ON storage.objects
 FOR INSERT WITH CHECK (
@@ -21,13 +33,13 @@ FOR INSERT WITH CHECK (
 );
 ```
 
-### Политика для чтения (SELECT):
+### Read Policy (SELECT):
 ```sql
 CREATE POLICY "Avatar images are publicly accessible" ON storage.objects
 FOR SELECT USING (bucket_id = 'avatars');
 ```
 
-### Политика для удаления (DELETE):
+### Delete Policy (DELETE):
 ```sql
 CREATE POLICY "Users can delete their own avatars" ON storage.objects
 FOR DELETE USING (
@@ -36,52 +48,75 @@ FOR DELETE USING (
 );
 ```
 
-## 3. Получение ключей
+## 4. Getting API Keys
 
-1. Перейдите в **Settings** → **API**
-2. Скопируйте:
+1. Go to **Settings** → **API**
+2. Copy:
    - **Project URL** (SUPABASE_URL)
-   - **anon public** ключ (SUPABASE_KEY)
+   - **anon public** key (SUPABASE_KEY)
 
-## 4. Настройка переменных окружения
+## 5. Environment Variables Setup
 
-Добавьте в ваш `.env` файл:
+Add to your `.env` file:
 
 ```env
+# Database Configuration (Supabase PostgreSQL)
+DATABASE_URL=postgresql+psycopg://postgres:[password]@db.[project-ref].supabase.co:5432/postgres
+
 # Supabase Configuration
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your-supabase-anon-key
 SUPABASE_BUCKET=avatars
 ```
 
-## 5. Установка зависимостей
+## 6. Installing Dependencies
 
 ```bash
 cd backend
 pip install supabase==2.3.4
 ```
 
-## 6. Перезапуск приложения
-
-После настройки переменных окружения перезапустите backend:
+## 7. Running Migrations
 
 ```bash
-# Если используете Docker
+# Run migrations to create tables in Supabase
+alembic upgrade head
+```
+
+## 8. Restarting the Application
+
+After setting up environment variables, restart the backend:
+
+```bash
+# If using Docker
 docker-compose restart backend
 
-# Если запускаете локально
+# If running locally
 uvicorn app.main:app --reload
 ```
 
-## Преимущества Supabase Storage
+## Benefits of Using Supabase
 
-- ✅ **CDN** - быстрая доставка изображений
-- ✅ **Масштабируемость** - автоматическое масштабирование
-- ✅ **Безопасность** - встроенные политики доступа
-- ✅ **Резервное копирование** - автоматические бэкапы
-- ✅ **Fallback** - если Supabase недоступен, используется локальное хранилище
+### Database:
+- **PostgreSQL** - powerful relational database
+- **Automatic backups** - daily snapshots
+- **Scalability** - automatic scaling
+- **Monitoring** - built-in metrics and logs
+- **Security** - SSL connections and RLS
 
-## Структура файлов в Supabase
+### Storage:
+- **CDN** - fast image delivery
+- **Scalability** - automatic scaling
+- **Security** - built-in access policies
+- **Backup** - automatic backups
+- **Fallback** - local storage if Supabase is unavailable
+
+### General:
+- **Unified platform** - database and storage in one project
+- **Easy management** - single interface for everything
+- **Free tier** - up to 500MB database and 1GB storage
+
+## File Structure in Supabase
 
 ```
 avatars/
@@ -93,4 +128,4 @@ avatars/
 └── ...
 ```
 
-Каждый пользователь имеет свою папку с ID пользователя.
+Each user has their own folder with user ID.
