@@ -2,6 +2,7 @@ import os
 import hashlib
 import secrets
 import tempfile
+import shutil
 from pathlib import Path
 from typing import Tuple, Optional
 from PIL import Image, UnidentifiedImageError
@@ -112,7 +113,7 @@ async def process_avatar_image(file_path: str, user_id: int) -> Tuple[str, str]:
             
             # Fallback to local storage
             output_path = AVATAR_DIR / filename
-            os.rename(temp_file.name, output_path)
+            shutil.move(temp_file.name, output_path)
             avatar_url = get_avatar_url(filename)
             
             return filename, avatar_url
