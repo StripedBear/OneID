@@ -27,7 +27,8 @@ class SupabaseStorage:
     
     def is_available(self) -> bool:
         """Check if Supabase Storage is available."""
-        return self.client is not None
+        # Temporarily disable Supabase Storage due to connection issues
+        return False
     
     async def upload_avatar(self, file_path: str, user_id: int, filename: str) -> Optional[str]:
         """
