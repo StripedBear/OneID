@@ -6,6 +6,7 @@ from app.schemas.auth import UserLogin, UserRegister, TokenResponse
 from app.core.security import create_access_token
 from app.api.deps import get_current_user
 from app.core.image_utils import is_safe_image_file, process_avatar_image, cleanup_temp_file, get_avatar_url
+from app.core.supabase_storage import supabase_storage
 from app.db.deps import get_db
 from app.models.user import User
 import tempfile
@@ -90,8 +91,7 @@ async def upload_avatar(
                     )
                 
                 # Process and save image
-                filename, file_path = process_avatar_image(temp_file.name, current_user.id)
-                avatar_url = get_avatar_url(filename)
+                filename, avatar_url = await process_avatar_image(temp_file.name, current_user.id)
                 
                 # Update user's avatar_url in database
                 crud_user.update_user_avatar(db, current_user.id, avatar_url)
@@ -156,13 +156,20 @@ async def remove_avatar(
     """
     try:
         if current_user.avatar_url:
-            # Delete the file from filesystem
-            try:
-                avatar_path = os.path.join(os.path.dirname(__file__), "..", "..", "uploads", "avatars", os.path.basename(current_user.avatar_url))
-                if os.path.exists(avatar_path):
-                    os.remove(avatar_path)
-            except Exception as e:
-                print(f"Warning: Could not delete avatar file: {e}")
+            # Extract filename from URL
+            filename = os.path.basename(current_user.avatar_url)
+            
+            # Try to delete from Supabase Storage first
+            if supabase_storage.is_available():
+                await supabase_storage.delete_avatar(current_user.id, filename)
+            else:
+                # Fallback to local filesystem deletion
+                try:
+                    avatar_path = os.path.join(os.path.dirname(__file__), "..", "..", "uploads", "avatars", filename)
+                    if os.path.exists(avatar_path):
+                        os.remove(avatar_path)
+                except Exception as e:
+                    print(f"Warning: Could not delete avatar file: {e}")
             
             # Clear avatar_url in database
             crud_user.update_user_avatar(db, current_user.id, "")

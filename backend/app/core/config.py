@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     # CORS Configuration
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
 
+    # Supabase Configuration
+    SUPABASE_URL: str = ""
+    SUPABASE_KEY: str = ""
+    SUPABASE_BUCKET: str = "avatars"
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
