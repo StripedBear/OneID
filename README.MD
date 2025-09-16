@@ -1,4 +1,4 @@
-# OneID - Living Address Book
+# OneID - Living Contact Book
 
 A modern contact management system that allows users to create public profiles with their contact channels.
 
