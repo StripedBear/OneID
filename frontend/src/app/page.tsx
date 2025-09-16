@@ -11,13 +11,14 @@ export default function HomePage() {
       <div className="relative z-10 flex items-center justify-center min-h-screen">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl font-bold mb-6">
-            OneID - Living Contact Book
-          </h1>
-          <p className="text-xl text-slate-300 mb-8">
-            Current communication channels by permanent link
-          </p>
-          
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold mb-6">
+              OneID - Living Contact Book
+            </h1>
+            <p className="text-xl text-slate-300">
+              Current communication channels by permanent link
+            </p>
+          </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
