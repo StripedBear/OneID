@@ -2,13 +2,13 @@
 
 A modern contact management system that allows users to create public profiles with their contact channels.
 
-## 🚀 Live Demo
+##  Live Demo
 
-- **Frontend**: https://oneid-frontend.vercel.app
+- **Frontend**: https://one-id-mu.vercel.app/
 - **Backend API**: https://oneid-m4s5.onrender.com
 - **API Documentation**: https://oneid-m4s5.onrender.com/docs
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 - **Frontend**: Next.js 14, React 18, TailwindCSS, TypeScript
 - **Backend**: FastAPI, Python 3.11, SQLAlchemy, Alembic
@@ -16,7 +16,7 @@ A modern contact management system that allows users to create public profiles w
 - **Storage**: Supabase Storage
 - **Deployment**: Vercel (Frontend), Render (Backend)
 
-## 🏃‍♂️ Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Node.js 18+
@@ -112,7 +112,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
 ##  TODO
-- [ ] Docker image
+- [x] Docker image
 - [ ] CDN integration for image serving
 - [ ] Image compression optimization
 - [ ] Backup and recovery system
