@@ -3,39 +3,9 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <div className="min-h-screen text-white bg-slate-900 relative overflow-hidden">
-      {/* Magnetic fields with attracting particles and holographic effects */}
+      {/* Gradient background with flowing colors */}
       <div className="absolute inset-0">
-        <div className="magnetic-field-overlay">
-          {/* Magnetic field centers */}
-          <div className="magnetic-center center-1"></div>
-          <div className="magnetic-center center-2"></div>
-          <div className="magnetic-center center-3"></div>
-          
-          {/* Attracting particles */}
-          <div className="particle particle-1"></div>
-          <div className="particle particle-2"></div>
-          <div className="particle particle-3"></div>
-          <div className="particle particle-4"></div>
-          <div className="particle particle-5"></div>
-          <div className="particle particle-6"></div>
-          <div className="particle particle-7"></div>
-          <div className="particle particle-8"></div>
-          <div className="particle particle-9"></div>
-          <div className="particle particle-10"></div>
-          
-          {/* Holographic waves */}
-          <div className="holographic-wave wave-1"></div>
-          <div className="holographic-wave wave-2"></div>
-          <div className="holographic-wave wave-3"></div>
-          <div className="holographic-wave wave-4"></div>
-          
-          {/* Magnetic field lines */}
-          <div className="field-line line-1"></div>
-          <div className="field-line line-2"></div>
-          <div className="field-line line-3"></div>
-          <div className="field-line line-4"></div>
-          <div className="field-line line-5"></div>
-        </div>
+        <div className="gradient-background"></div>
       </div>
       
       <div className="relative z-10">
