@@ -83,39 +83,34 @@ export default function UserProfile({ params }: UserProfileProps) {
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto bg-slate-800 rounded-2xl shadow-2xl p-8">
           <div className="text-center">
-            {/* Avatar with QR and Copy buttons - CENTERED LAYOUT */}
-            <div className="flex items-center justify-center gap-6 mb-8">
-              {/* Avatar with QR overlay - CENTER */}
-              <div className="relative flex-shrink-0">
-                <Avatar 
-                  src={user.avatar_url || null} 
-                  alt={getDisplayName(user)} 
-                  size={120}
-                />
-                {/* QR icon overlay - BOTTOM RIGHT */}
-                <button 
-                  onClick={() => setIsQrModalOpen(true)}
-                  className="absolute -bottom-1 -right-1 bg-blue-600 hover:bg-blue-700 rounded-full p-2 border-2 border-white shadow-lg transition-colors cursor-pointer"
-                >
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                  </svg>
-                </button>
-              </div>
-              
-              {/* Copy button - RIGHT SIDE */}
-              <div className="flex-shrink-0">
-                <CopyButton 
-                  value={`${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/${user.username}`}
-                  size="sm"
-                />
-              </div>
+            {/* Avatar with QR overlay - CENTER */}
+            <div className="relative flex-shrink-0 mb-6">
+              <Avatar 
+                src={user.avatar_url || null} 
+                alt={getDisplayName(user)} 
+                size={120}
+              />
+              {/* QR icon overlay - BOTTOM RIGHT */}
+              <button 
+                onClick={() => setIsQrModalOpen(true)}
+                className="absolute -bottom-1 -right-1 bg-blue-600 hover:bg-blue-700 rounded-full p-2 border-2 border-white shadow-lg transition-colors cursor-pointer"
+              >
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+              </button>
             </div>
             
             <h1 className="text-3xl font-bold text-white mb-2">
               {getDisplayName(user)}
             </h1>
-            <p className="text-slate-300 mb-2">@{user.username}</p>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <p className="text-slate-300">@{user.username}</p>
+              <CopyButton 
+                value={`${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/${user.username}`}
+                size="sm"
+              />
+            </div>
             {user.bio && (
               <p className="text-slate-400 mb-8">{user.bio}</p>
             )}
