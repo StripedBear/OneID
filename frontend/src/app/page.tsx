@@ -18,25 +18,6 @@ export default function HomePage() {
             Current communication channels by permanent link
           </p>
           
-          <div className="bg-slate-800 rounded-2xl shadow-2xl p-8 mb-8">
-            <h2 className="text-2xl font-semibold mb-4">
-              Public Profiles
-            </h2>
-            <p className="text-slate-300 mb-4">
-              Discover people and their channels: <code className="bg-slate-700 px-2 py-1 rounded">/username</code>
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/alice" className="text-blue-400 hover:text-blue-300 bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg transition-colors">
-                /alice
-              </Link>
-              <Link href="/bob" className="text-blue-400 hover:text-blue-300 bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg transition-colors">
-                /bob
-              </Link>
-              <Link href="/charlie" className="text-blue-400 hover:text-blue-300 bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg transition-colors">
-                /charlie
-              </Link>
-            </div>
-          </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
