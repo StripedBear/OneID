@@ -43,7 +43,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+    <div className="bg-slate-900 flex items-center justify-center py-16">
       <div className="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl p-8">
         <h1 className="text-2xl font-bold text-center mb-6">Sign Up</h1>
         

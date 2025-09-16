@@ -105,7 +105,7 @@ export default function ContactsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-900">
+      <div className="bg-slate-900">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">
             <div className="space-y-6">
@@ -124,7 +124,7 @@ export default function ContactsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="bg-slate-900">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           <div className="space-y-6">

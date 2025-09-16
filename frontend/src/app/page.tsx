@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen text-white bg-slate-900 relative overflow-hidden">
+    <div className="text-white bg-slate-900 relative overflow-hidden">
       {/* Gradient background with flowing colors */}
       <div className="absolute inset-0">
         <div className="gradient-background"></div>
