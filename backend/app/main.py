@@ -13,7 +13,7 @@ from app.api.routes import contacts as contacts_routes
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version="0.1.0",
-    description="MVP: Living Address Book / DNS for People",
+    description="MVP: Living Contact Book / DNS for People",
 )
 
 # Раздача статических файлов (аватары)
