@@ -1,6 +1,7 @@
 import os
 import hashlib
 import secrets
+import tempfile
 from pathlib import Path
 from typing import Tuple, Optional
 from PIL import Image, UnidentifiedImageError
