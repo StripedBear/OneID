@@ -16,7 +16,7 @@ export default function HomePage() {
               OneID - Living Contact Book
             </h1>
             <p className="text-xl text-slate-300">
-              Current communication channels by permanent link
+              One address — instant connection
             </p>
           </div>
           
