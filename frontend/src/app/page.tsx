@@ -8,8 +8,8 @@ export default function HomePage() {
         <div className="gradient-background"></div>
       </div>
       
-      <div className="relative z-10">
-      <div className="container mx-auto px-4 py-16">
+      <div className="relative z-10 flex items-center justify-center min-h-screen">
+      <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl font-bold mb-6">
             OneID - Living Contact Book
@@ -28,7 +28,7 @@ export default function HomePage() {
             </Link>
             <Link 
               href="/login" 
-              className="border border-slate-600 text-slate-300 hover:bg-slate-800 font-medium py-3 px-6 rounded-xl transition-colors"
+              className="bg-slate-800 border border-slate-600 text-slate-300 hover:bg-slate-700 font-medium py-3 px-6 rounded-xl transition-colors"
             >
               I have an account
             </Link>
