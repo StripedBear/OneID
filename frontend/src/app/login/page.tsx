@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { setToken } from "@/lib/auth";
+import SocialAuthButtons from "@/components/SocialAuthButtons";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -81,6 +82,8 @@ export default function LoginPage() {
             {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
+        
+        <SocialAuthButtons />
         
         <p className="text-center text-sm text-slate-400 mt-4">
           Don't have an account?{" "}

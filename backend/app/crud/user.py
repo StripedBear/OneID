@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.user import User
 from app.core.security import get_password_hash, verify_password
-from app.schemas.auth import UserRegister
+from app.schemas.auth import UserRegister, OAuthUserInfo
 
 
 def get(db: Session, user_id: int) -> Optional[User]:
@@ -19,6 +19,19 @@ def get_by_email(db: Session, email: str) -> Optional[User]:
 
 def get_by_username(db: Session, username: str) -> Optional[User]:
     stmt = select(User).where(User.username == username)
+    return db.scalar(stmt)
+
+
+def get_by_oauth_id(db: Session, provider: str, provider_id: str) -> Optional[User]:
+    """Get user by OAuth provider ID."""
+    if provider == "google":
+        stmt = select(User).where(User.google_id == provider_id)
+    elif provider == "github":
+        stmt = select(User).where(User.github_id == provider_id)
+    elif provider == "discord":
+        stmt = select(User).where(User.discord_id == provider_id)
+    else:
+        return None
     return db.scalar(stmt)
 
 
@@ -93,6 +106,54 @@ def update_user_avatar(db: Session, user_id: int, avatar_url: str) -> User:
     db.commit()
     db.refresh(user)
     return user
+
+
+def create_oauth_user(db: Session, oauth_data: OAuthUserInfo) -> User:
+    """Create a new user from OAuth data."""
+    # Check if user already exists by OAuth ID
+    existing_user = get_by_oauth_id(db, oauth_data.provider, oauth_data.provider_id)
+    if existing_user:
+        return existing_user
+    
+    # Check if email already exists
+    existing_email_user = get_by_email(db, oauth_data.email)
+    if existing_email_user:
+        # Link OAuth account to existing user
+        if oauth_data.provider == "google":
+            existing_email_user.google_id = oauth_data.provider_id
+        elif oauth_data.provider == "github":
+            existing_email_user.github_id = oauth_data.provider_id
+        elif oauth_data.provider == "discord":
+            existing_email_user.discord_id = oauth_data.provider_id
+        
+        db.commit()
+        db.refresh(existing_email_user)
+        return existing_email_user
+    
+    # Create new user
+    db_user = User(
+        email=oauth_data.email,
+        username=oauth_data.username,
+        password_hash=None,  # OAuth users don't have passwords
+        display_name=oauth_data.display_name,
+        first_name=oauth_data.first_name,
+        last_name=oauth_data.last_name,
+        avatar_url=oauth_data.avatar_url,
+        bio=None
+    )
+    
+    # Set OAuth provider ID
+    if oauth_data.provider == "google":
+        db_user.google_id = oauth_data.provider_id
+    elif oauth_data.provider == "github":
+        db_user.github_id = oauth_data.provider_id
+    elif oauth_data.provider == "discord":
+        db_user.discord_id = oauth_data.provider_id
+    
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
 
 
 def update_user_profile(db: Session, user_id: int, profile_data: dict) -> User:

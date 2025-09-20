@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { setToken } from "@/lib/auth";
+import SocialAuthButtons from "@/components/SocialAuthButtons";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -134,6 +135,8 @@ export default function RegisterPage() {
             {isLoading ? "Signing up..." : "Create Account"}
           </button>
         </form>
+        
+        <SocialAuthButtons />
         
         <p className="text-center text-sm text-slate-400 mt-4">
           Already have an account?{" "}

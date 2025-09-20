@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
+from typing import Optional
 
 
 class UserLogin(BaseModel):
@@ -32,3 +33,20 @@ class LoginRequest(BaseModel):
     # Для MVP считаем, что логин по email + password
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
+
+
+# OAuth схемы
+class OAuthUserInfo(BaseModel):
+    provider: str  # google, github, discord
+    provider_id: str
+    email: str
+    username: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    avatar_url: Optional[str] = None
+    display_name: Optional[str] = None
+
+
+class OAuthCallback(BaseModel):
+    code: str
+    state: Optional[str] = None

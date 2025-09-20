@@ -17,9 +17,22 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: CORS_ORIGINS
-        value: '["https://humandns-frontend.onrender.com"]'
+        value: '["https://one-id-mu.vercel.app"]'
       - key: PYTHON_VERSION
         value: 3.11.0
+      # OAuth Configuration
+      - key: GOOGLE_CLIENT_ID
+        value: your-google-client-id
+      - key: GOOGLE_CLIENT_SECRET
+        value: your-google-client-secret
+      - key: GITHUB_CLIENT_ID
+        value: your-github-client-id
+      - key: GITHUB_CLIENT_SECRET
+        value: your-github-client-secret
+      - key: DISCORD_CLIENT_ID
+        value: your-discord-client-id
+      - key: DISCORD_CLIENT_SECRET
+        value: your-discord-client-secret
     healthCheckPath: /health
     autoDeploy: true
     branch: main
@@ -35,8 +48,10 @@ services:
       npm run build
     staticPublishPath: ./frontend/out
     envVars:
-      - key: NEXT_PUBLIC_API_URL
-        value: https://humandns-backend.onrender.com
+      - key: NEXT_PUBLIC_API_BASE_URL
+        value: https://oneid-m4s5.onrender.com/api/v1
+      - key: NEXT_PUBLIC_FRONTEND_URL
+        value: https://one-id-mu.vercel.app
       - key: NODE_ENV
         value: production
     autoDeploy: true

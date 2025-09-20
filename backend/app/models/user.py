@@ -11,7 +11,12 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     username: Mapped[str] = mapped_column(String(50), unique=True, index=True, nullable=False)
     # Храним только хэш пароля (будем заполнять в шаге авторизации)
-    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    password_hash: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    
+    # OAuth провайдеры
+    google_id: Mapped[str | None] = mapped_column(String(100), unique=True, index=True, nullable=True)
+    github_id: Mapped[str | None] = mapped_column(String(100), unique=True, index=True, nullable=True)
+    discord_id: Mapped[str | None] = mapped_column(String(100), unique=True, index=True, nullable=True)
 
     # Для публичного профиля — аватар и имя (опционально)
     display_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
