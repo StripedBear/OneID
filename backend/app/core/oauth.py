@@ -1,8 +1,12 @@
-from authlib.integrations.fastapi_client import OAuth2
+from authlib.integrations.starlette_client import OAuth
 from app.core.config import settings
 
+# Создаем OAuth клиент
+oauth = OAuth()
+
 # Google OAuth2
-google_oauth = OAuth2(
+oauth.register(
+    name='google',
     client_id=settings.GOOGLE_CLIENT_ID,
     client_secret=settings.GOOGLE_CLIENT_SECRET,
     server_metadata_url="https://accounts.google.com/.well-known/openid_configuration",
@@ -10,7 +14,8 @@ google_oauth = OAuth2(
 )
 
 # GitHub OAuth2
-github_oauth = OAuth2(
+oauth.register(
+    name='github',
     client_id=settings.GITHUB_CLIENT_ID,
     client_secret=settings.GITHUB_CLIENT_SECRET,
     authorize_url="https://github.com/login/oauth/authorize",
@@ -19,7 +24,8 @@ github_oauth = OAuth2(
 )
 
 # Discord OAuth2
-discord_oauth = OAuth2(
+oauth.register(
+    name='discord',
     client_id=settings.DISCORD_CLIENT_ID,
     client_secret=settings.DISCORD_CLIENT_SECRET,
     authorize_url="https://discord.com/api/oauth2/authorize",
@@ -29,8 +35,8 @@ discord_oauth = OAuth2(
 
 # OAuth провайдеры
 OAUTH_PROVIDERS = {
-    "google": google_oauth,
-    "github": github_oauth,
-    "discord": discord_oauth
+    "google": oauth.google,
+    "github": oauth.github,
+    "discord": oauth.discord
 }
 
