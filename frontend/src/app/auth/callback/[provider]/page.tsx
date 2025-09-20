@@ -1,15 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { setToken } from '@/lib/auth';
-
-// Force dynamic rendering for this page
-export const dynamic = 'force-dynamic';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = useParams();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -32,9 +30,8 @@ export default function AuthCallbackPage() {
           return;
         }
 
-        // Get the provider from the URL path
-        const pathParts = window.location.pathname.split('/');
-        const provider = pathParts[pathParts.length - 2]; // /auth/callback/google -> google
+        // Get the provider from the URL params
+        const provider = params.provider as string;
 
         if (!['google', 'github', 'discord'].includes(provider)) {
           setError('Invalid OAuth provider');
@@ -67,7 +64,7 @@ export default function AuthCallbackPage() {
     };
 
     handleCallback();
-  }, [searchParams, router]);
+  }, [searchParams, router, params]);
 
   if (loading) {
     return (
@@ -104,4 +101,3 @@ export default function AuthCallbackPage() {
 
   return null;
 }
-
