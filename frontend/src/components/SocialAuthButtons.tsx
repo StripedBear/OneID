@@ -14,8 +14,8 @@ export default function SocialAuthButtons({ onSuccess, onError }: SocialAuthButt
     setLoading(provider);
     try {
       // Redirect to backend OAuth endpoint
-      const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
-      const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000';
+      const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://oneid-m4s5.onrender.com/api/v1';
+      const frontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || 'https://one-id-mu.vercel.app';
       
       // Set redirect URI for callback
       const redirectUri = `${frontendUrl}/auth/callback/${provider}`;
