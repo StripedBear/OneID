@@ -2,6 +2,7 @@ from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
 import os
 
 from app.core.config import settings
@@ -23,6 +24,9 @@ if not os.path.exists(uploads_dir):
     os.makedirs(uploads_dir, exist_ok=True)
 
 app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+
+# Session middleware для OAuth
+app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 
 # CORS — для локальной разработки с Next.js и для продакшена через .env
 app.add_middleware(
