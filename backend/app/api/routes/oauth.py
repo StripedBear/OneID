@@ -73,7 +73,7 @@ async def google_login(request: Request):
     # Get redirect_uri from query params or use default
     redirect_uri = request.query_params.get("redirect_uri", "http://localhost:3000/auth/callback/google")
     
-    return await google_oauth.authorize_redirect(redirect_uri=redirect_uri)
+    return await google_oauth.authorize_redirect(request, redirect_uri)
 
 
 @router.get("/github")
@@ -84,7 +84,7 @@ async def github_login(request: Request):
     # Get redirect_uri from query params or use default
     redirect_uri = request.query_params.get("redirect_uri", "http://localhost:3000/auth/callback/github")
     
-    return await github_oauth.authorize_redirect(redirect_uri=redirect_uri)
+    return await github_oauth.authorize_redirect(request, redirect_uri)
 
 
 @router.get("/discord")
@@ -95,7 +95,7 @@ async def discord_login(request: Request):
     # Get redirect_uri from query params or use default
     redirect_uri = request.query_params.get("redirect_uri", "http://localhost:3000/auth/callback/discord")
     
-    return await discord_oauth.authorize_redirect(redirect_uri=redirect_uri)
+    return await discord_oauth.authorize_redirect(request, redirect_uri)
 
 
 @router.get("/google/callback", response_model=TokenResponse)
