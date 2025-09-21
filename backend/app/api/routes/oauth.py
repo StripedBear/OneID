@@ -5,9 +5,10 @@ from app.db.deps import get_db
 from app.crud import user as crud_user
 from app.schemas.auth import OAuthUserInfo, TokenResponse
 from app.core.security import create_access_token
-from app.core.oauth import OAUTH_PROVIDERS
+from app.core.config import settings
 import httpx
 import json
+import secrets
 
 router = APIRouter(prefix="/oauth", tags=["oauth"])
 
@@ -80,18 +81,22 @@ async def google_login(request: Request):
 @router.get("/github")
 async def github_login(request: Request):
     """Initiate GitHub OAuth login."""
-    from app.core.oauth import github_oauth
+    # Generate state for CSRF protection
+    state = secrets.token_urlsafe(32)
     
     # Get redirect_uri from query params or use default
     redirect_uri = request.query_params.get("redirect_uri", "http://localhost:3000/auth/callback/github")
     
-    # Generate authorization URL
-    auth_url = github_oauth.create_authorization_url(
-        "https://github.com/login/oauth/authorize",
-        redirect_uri=redirect_uri
+    # Build GitHub authorization URL
+    auth_url = (
+        f"https://github.com/login/oauth/authorize"
+        f"?client_id={settings.GITHUB_CLIENT_ID}"
+        f"&redirect_uri={redirect_uri}"
+        f"&scope=user:email"
+        f"&state={state}"
     )
     
-    return RedirectResponse(url=auth_url[0])
+    return RedirectResponse(url=auth_url)
 
 
 @router.get("/discord")
@@ -141,8 +146,6 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
 @router.get("/github/callback", response_model=TokenResponse)
 async def github_callback(request: Request, db: Session = Depends(get_db)):
     """Handle GitHub OAuth callback."""
-    from app.core.oauth import github_oauth
-    
     # Get authorization code from query params
     code = request.query_params.get("code")
     state = request.query_params.get("state")
@@ -150,14 +153,30 @@ async def github_callback(request: Request, db: Session = Depends(get_db)):
     if not code:
         raise HTTPException(status_code=400, detail="Authorization code not provided")
     
-    # Exchange code for token
-    token = await github_oauth.fetch_token(
-        "https://github.com/login/oauth/access_token",
-        code=code,
-        redirect_uri=str(request.url_for("github_callback"))
-    )
+    # Exchange code for token using simple HTTP request
+    async with httpx.AsyncClient() as client:
+        token_response = await client.post(
+            "https://github.com/login/oauth/access_token",
+            data={
+                "client_id": settings.GITHUB_CLIENT_ID,
+                "client_secret": settings.GITHUB_CLIENT_SECRET,
+                "code": code,
+                "redirect_uri": str(request.url_for("github_callback"))
+            },
+            headers={"Accept": "application/json"}
+        )
+        
+        if token_response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Failed to exchange code for token")
+        
+        token_data = token_response.json()
+        access_token = token_data.get("access_token")
+        
+        if not access_token:
+            raise HTTPException(status_code=400, detail="No access token received")
     
-    user_info = await get_github_user_info(token["access_token"])
+    # Get user info from GitHub
+    user_info = await get_github_user_info(access_token)
     
     # Create OAuth user data
     oauth_data = OAuthUserInfo(
@@ -191,7 +210,7 @@ async def discord_callback(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(status_code=400, detail="Authorization code not provided")
     
     # Exchange code for token
-    token = await discord_oauth.fetch_token(
+    token = discord_oauth.fetch_token(
         "https://discord.com/api/oauth2/token",
         code=code,
         redirect_uri=str(request.url_for("discord_callback"))
