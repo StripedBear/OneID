@@ -79,23 +79,23 @@ async def google_login(request: Request):
 @router.get("/github")
 async def github_login(request: Request):
     """Initiate GitHub OAuth login."""
-    from app.core.oauth import oauth
+    from app.core.oauth import github_oauth
     
     # Get redirect_uri from query params or use default
     redirect_uri = request.query_params.get("redirect_uri", "http://localhost:3000/auth/callback/github")
     
-    return await oauth.github.authorize_redirect(request, redirect_uri)
+    return await github_oauth.authorize_redirect(request, redirect_uri)
 
 
 @router.get("/discord")
 async def discord_login(request: Request):
     """Initiate Discord OAuth login."""
-    from app.core.oauth import oauth
+    from app.core.oauth import discord_oauth
     
     # Get redirect_uri from query params or use default
     redirect_uri = request.query_params.get("redirect_uri", "http://localhost:3000/auth/callback/discord")
     
-    return await oauth.discord.authorize_redirect(request, redirect_uri)
+    return await discord_oauth.authorize_redirect(request, redirect_uri)
 
 
 @router.get("/google/callback", response_model=TokenResponse)
@@ -128,9 +128,9 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
 @router.get("/github/callback", response_model=TokenResponse)
 async def github_callback(request: Request, db: Session = Depends(get_db)):
     """Handle GitHub OAuth callback."""
-    from app.core.oauth import oauth
+    from app.core.oauth import github_oauth
     
-    token = await oauth.github.authorize_access_token(request)
+    token = await github_oauth.authorize_access_token(request)
     user_info = await get_github_user_info(token["access_token"])
     
     # Create OAuth user data
@@ -155,9 +155,9 @@ async def github_callback(request: Request, db: Session = Depends(get_db)):
 @router.get("/discord/callback", response_model=TokenResponse)
 async def discord_callback(request: Request, db: Session = Depends(get_db)):
     """Handle Discord OAuth callback."""
-    from app.core.oauth import oauth
+    from app.core.oauth import discord_oauth
     
-    token = await oauth.discord.authorize_access_token(request)
+    token = await discord_oauth.authorize_access_token(request)
     user_info = await get_discord_user_info(token["access_token"])
     
     # Create OAuth user data
