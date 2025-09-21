@@ -154,7 +154,7 @@ async def github_callback(request: Request, db: Session = Depends(get_db)):
     token = await github_oauth.fetch_token(
         "https://github.com/login/oauth/access_token",
         code=code,
-        redirect_uri=request.url_for("github_callback")
+        redirect_uri=str(request.url_for("github_callback"))
     )
     
     user_info = await get_github_user_info(token["access_token"])
@@ -194,7 +194,7 @@ async def discord_callback(request: Request, db: Session = Depends(get_db)):
     token = await discord_oauth.fetch_token(
         "https://discord.com/api/oauth2/token",
         code=code,
-        redirect_uri=request.url_for("discord_callback")
+        redirect_uri=str(request.url_for("discord_callback"))
     )
     
     user_info = await get_discord_user_info(token["access_token"])
