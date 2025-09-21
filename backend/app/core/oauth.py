@@ -23,7 +23,7 @@ oauth.register(
     client_secret=settings.GITHUB_CLIENT_SECRET,
     authorize_url="https://github.com/login/oauth/authorize",
     token_url="https://github.com/login/oauth/access_token",
-    scope="user:email"
+    client_kwargs={"scope": "user:email"}
 )
 
 # Discord OAuth2
@@ -33,7 +33,7 @@ oauth.register(
     client_secret=settings.DISCORD_CLIENT_SECRET,
     authorize_url="https://discord.com/api/oauth2/authorize",
     token_url="https://discord.com/api/oauth2/token",
-    scope="identify email"
+    client_kwargs={"scope": "identify email"}
 )
 
 # OAuth провайдеры
