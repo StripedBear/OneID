@@ -1,4 +1,5 @@
 from authlib.integrations.starlette_client import OAuth
+from authlib.integrations.httpx_client import OAuth2Client
 from app.core.config import settings
 
 # Создаем OAuth клиент
@@ -16,8 +17,6 @@ oauth.register(
 # GitHub OAuth2 - создаем клиент напрямую
 print(f"GitHub Client ID: {settings.GITHUB_CLIENT_ID}")
 print(f"GitHub Client Secret: {'*' * len(settings.GITHUB_CLIENT_SECRET) if settings.GITHUB_CLIENT_SECRET else 'NOT SET'}")
-
-from authlib.integrations.starlette_client import OAuth2Client
 
 github_oauth = OAuth2Client(
     client_id=settings.GITHUB_CLIENT_ID,

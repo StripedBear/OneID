@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.db.deps import get_db
 from app.crud import user as crud_user
@@ -84,7 +85,13 @@ async def github_login(request: Request):
     # Get redirect_uri from query params or use default
     redirect_uri = request.query_params.get("redirect_uri", "http://localhost:3000/auth/callback/github")
     
-    return await github_oauth.authorize_redirect(request, redirect_uri)
+    # Generate authorization URL
+    auth_url = github_oauth.create_authorization_url(
+        github_oauth.authorize_url,
+        redirect_uri=redirect_uri
+    )
+    
+    return RedirectResponse(url=auth_url[0])
 
 
 @router.get("/discord")
@@ -95,7 +102,13 @@ async def discord_login(request: Request):
     # Get redirect_uri from query params or use default
     redirect_uri = request.query_params.get("redirect_uri", "http://localhost:3000/auth/callback/discord")
     
-    return await discord_oauth.authorize_redirect(request, redirect_uri)
+    # Generate authorization URL
+    auth_url = discord_oauth.create_authorization_url(
+        discord_oauth.authorize_url,
+        redirect_uri=redirect_uri
+    )
+    
+    return RedirectResponse(url=auth_url[0])
 
 
 @router.get("/google/callback", response_model=TokenResponse)
@@ -130,7 +143,20 @@ async def github_callback(request: Request, db: Session = Depends(get_db)):
     """Handle GitHub OAuth callback."""
     from app.core.oauth import github_oauth
     
-    token = await github_oauth.authorize_access_token(request)
+    # Get authorization code from query params
+    code = request.query_params.get("code")
+    state = request.query_params.get("state")
+    
+    if not code:
+        raise HTTPException(status_code=400, detail="Authorization code not provided")
+    
+    # Exchange code for token
+    token = await github_oauth.fetch_token(
+        github_oauth.token_url,
+        code=code,
+        redirect_uri=request.url_for("github_callback")
+    )
+    
     user_info = await get_github_user_info(token["access_token"])
     
     # Create OAuth user data
@@ -157,7 +183,20 @@ async def discord_callback(request: Request, db: Session = Depends(get_db)):
     """Handle Discord OAuth callback."""
     from app.core.oauth import discord_oauth
     
-    token = await discord_oauth.authorize_access_token(request)
+    # Get authorization code from query params
+    code = request.query_params.get("code")
+    state = request.query_params.get("state")
+    
+    if not code:
+        raise HTTPException(status_code=400, detail="Authorization code not provided")
+    
+    # Exchange code for token
+    token = await discord_oauth.fetch_token(
+        discord_oauth.token_url,
+        code=code,
+        redirect_uri=request.url_for("discord_callback")
+    )
+    
     user_info = await get_discord_user_info(token["access_token"])
     
     # Create OAuth user data
