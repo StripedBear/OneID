@@ -87,7 +87,7 @@ async def github_login(request: Request):
     
     # Generate authorization URL
     auth_url = github_oauth.create_authorization_url(
-        github_oauth.authorize_url,
+        "https://github.com/login/oauth/authorize",
         redirect_uri=redirect_uri
     )
     
@@ -104,7 +104,7 @@ async def discord_login(request: Request):
     
     # Generate authorization URL
     auth_url = discord_oauth.create_authorization_url(
-        discord_oauth.authorize_url,
+        "https://discord.com/api/oauth2/authorize",
         redirect_uri=redirect_uri
     )
     
@@ -152,7 +152,7 @@ async def github_callback(request: Request, db: Session = Depends(get_db)):
     
     # Exchange code for token
     token = await github_oauth.fetch_token(
-        github_oauth.token_url,
+        "https://github.com/login/oauth/access_token",
         code=code,
         redirect_uri=request.url_for("github_callback")
     )
@@ -192,7 +192,7 @@ async def discord_callback(request: Request, db: Session = Depends(get_db)):
     
     # Exchange code for token
     token = await discord_oauth.fetch_token(
-        discord_oauth.token_url,
+        "https://discord.com/api/oauth2/token",
         code=code,
         redirect_uri=request.url_for("discord_callback")
     )
