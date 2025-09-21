@@ -14,13 +14,16 @@ oauth.register(
 )
 
 # GitHub OAuth2
+print(f"GitHub Client ID: {settings.GITHUB_CLIENT_ID}")
+print(f"GitHub Client Secret: {'*' * len(settings.GITHUB_CLIENT_SECRET) if settings.GITHUB_CLIENT_SECRET else 'NOT SET'}")
+
 oauth.register(
     name='github',
     client_id=settings.GITHUB_CLIENT_ID,
     client_secret=settings.GITHUB_CLIENT_SECRET,
     authorize_url="https://github.com/login/oauth/authorize",
     token_url="https://github.com/login/oauth/access_token",
-    client_kwargs={"scope": "user:email"}
+    scope="user:email"
 )
 
 # Discord OAuth2
@@ -30,7 +33,7 @@ oauth.register(
     client_secret=settings.DISCORD_CLIENT_SECRET,
     authorize_url="https://discord.com/api/oauth2/authorize",
     token_url="https://discord.com/api/oauth2/token",
-    client_kwargs={"scope": "identify email"}
+    scope="identify email"
 )
 
 # OAuth провайдеры
