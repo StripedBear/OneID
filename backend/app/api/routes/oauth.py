@@ -3,6 +3,8 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from app.db.deps import get_db
 from app.crud import user as crud_user
+from app.crud import channel as crud_channel
+from app.crud import group as crud_group
 from app.schemas.auth import OAuthUserInfo, TokenResponse
 from app.core.security import create_access_token
 from app.core.config import settings
@@ -11,6 +13,92 @@ import json
 import secrets
 
 router = APIRouter(prefix="/oauth", tags=["oauth"])
+
+
+def create_oauth_channels(db: Session, user, provider: str, user_info: dict):
+    """Create channels automatically based on OAuth provider and user info."""
+    try:
+        # Get or create "OAuth" group
+        oauth_group = crud_group.get_group_by_name(db, "OAuth", user.id)
+        if not oauth_group:
+            from app.schemas.group import GroupCreate
+            oauth_group = crud_group.create_group(db, GroupCreate(name="OAuth", description="Channels added via OAuth login"), user.id)
+        
+        # Create channels based on provider
+        if provider == "github":
+            # Add GitHub profile URL
+            if user_info.get("login"):
+                github_url = f"https://github.com/{user_info['login']}"
+                # Check if channel already exists
+                existing_channels = crud_channel.list_for_user(db, user.id)
+                if not any(ch.type == "github" and ch.value == github_url for ch in existing_channels):
+                    crud_channel.create(
+                        db, user=user,
+                        type="github",
+                        value=github_url,
+                        label="GitHub Profile",
+                        is_public=True,
+                        is_primary=False,
+                        sort_order=0,
+                        group_id=oauth_group.id
+                    )
+        
+        elif provider == "google":
+            # Add Google profile (if available)
+            if user_info.get("email"):
+                # Check if channel already exists
+                existing_channels = crud_channel.list_for_user(db, user.id)
+                if not any(ch.type == "email" and ch.value == user_info["email"] and ch.label == "Google Email" for ch in existing_channels):
+                    crud_channel.create(
+                        db, user=user,
+                        type="email",
+                        value=user_info["email"],
+                        label="Google Email",
+                        is_public=True,
+                        is_primary=True,
+                        sort_order=0,
+                        group_id=oauth_group.id
+                    )
+        
+        elif provider == "discord":
+            # Add Discord username
+            if user_info.get("username"):
+                discord_handle = f"@{user_info['username']}"
+                # Check if channel already exists
+                existing_channels = crud_channel.list_for_user(db, user.id)
+                if not any(ch.type == "custom" and ch.value == discord_handle and ch.label == "Discord" for ch in existing_channels):
+                    crud_channel.create(
+                        db, user=user,
+                        type="custom",
+                        value=discord_handle,
+                        label="Discord",
+                        is_public=True,
+                        is_primary=False,
+                        sort_order=0,
+                        group_id=oauth_group.id
+                    )
+        
+        elif provider == "telegram":
+            # Add Telegram username
+            if user_info.get("username"):
+                telegram_handle = f"@{user_info['username']}"
+                # Check if channel already exists
+                existing_channels = crud_channel.list_for_user(db, user.id)
+                if not any(ch.type == "telegram" and ch.value == telegram_handle for ch in existing_channels):
+                    crud_channel.create(
+                        db, user=user,
+                        type="telegram",
+                        value=telegram_handle,
+                        label="Telegram",
+                        is_public=True,
+                        is_primary=False,
+                        sort_order=0,
+                        group_id=oauth_group.id
+                    )
+    
+    except Exception as e:
+        # Don't fail OAuth login if channel creation fails
+        print(f"Failed to create OAuth channels: {e}")
 
 
 async def get_google_user_info(access_token: str) -> dict:
@@ -64,6 +152,18 @@ async def get_discord_user_info(access_token: str) -> dict:
         )
         if response.status_code != 200:
             raise HTTPException(status_code=400, detail="Failed to get Discord user info")
+        return response.json()
+
+
+async def get_telegram_user_info(access_token: str) -> dict:
+    """Get user info from Telegram."""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            "https://api.telegram.org/bot/getMe",
+            headers={"Authorization": f"Bearer {access_token}"}
+        )
+        if response.status_code != 200:
+            raise HTTPException(status_code=400, detail="Failed to get Telegram user info")
         return response.json()
 
 
@@ -138,6 +238,10 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
     
     # Create or get user
     user = crud_user.create_oauth_user(db, oauth_data)
+    
+    # Create OAuth channels automatically
+    create_oauth_channels(db, user, "google", user_info)
+    
     access_token = create_access_token(subject=user.id)
     
     return TokenResponse(access_token=access_token, token_type="bearer")
@@ -192,6 +296,10 @@ async def github_callback(request: Request, db: Session = Depends(get_db)):
     
     # Create or get user
     user = crud_user.create_oauth_user(db, oauth_data)
+    
+    # Create OAuth channels automatically
+    create_oauth_channels(db, user, "github", user_info)
+    
     access_token = create_access_token(subject=user.id)
     
     # Redirect to frontend with token
@@ -233,6 +341,10 @@ async def discord_callback(request: Request, db: Session = Depends(get_db)):
     
     # Create or get user
     user = crud_user.create_oauth_user(db, oauth_data)
+    
+    # Create OAuth channels automatically
+    create_oauth_channels(db, user, "discord", user_info)
+    
     access_token = create_access_token(subject=user.id)
     
     return TokenResponse(access_token=access_token, token_type="bearer")
