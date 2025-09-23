@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, User } from "lucide-react";
 
 type Props = { 
   src?: string | null; 
@@ -59,11 +59,11 @@ export default function Avatar({ src, alt, size = 64, clickable = true }: Props)
   if (!src) {
     return (
       <div
-        className={`${cls} flex items-center justify-center`}
+        className={`${cls} flex items-center justify-center bg-slate-700`}
         style={{ width: size, height: size }}
         aria-label={alt}
       >
-        <span className="text-slate-500 dark:text-slate-400 text-sm">No Avatar</span>
+        <User className="text-slate-400" size={size * 0.6} />
       </div>
     );
   }

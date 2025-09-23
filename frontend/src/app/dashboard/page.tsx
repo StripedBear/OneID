@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { api } from "@/lib/api";
+import { api, groupsApi, type Group, type GroupCreate } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import type { UserPublic, Channel } from "@/types";
 import { ChannelIcon } from "@/components/ChannelIcon";
 import AvatarButton from "@/components/AvatarButton";
 import QRCodeCard from "@/components/QRCodeCard";
 import Link from "next/link";
+import { Plus, Edit3, Trash2, Users } from "lucide-react";
 
 // Helper function to get display name
 const getDisplayName = (user: UserPublic): string => {
@@ -33,7 +34,7 @@ type NewChannel = {
   is_public: boolean;
   is_primary: boolean;
   sort_order: number;
-  group?: string;
+  group_id?: number | null;
 };
 
 const channelTypes = ["phone","email","telegram","whatsapp","signal","instagram","twitter","facebook","linkedin","website","github","custom"];
@@ -42,12 +43,14 @@ export default function DashboardPage() {
   const { token, isAuthenticated } = useAuth();
   const [user, setUser] = useState<UserPublic | null>(null);
   const [channels, setChannels] = useState<Channel[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showQR, setShowQR] = useState(false);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
   const [showAddChannel, setShowAddChannel] = useState(false);
+  const [showAddGroup, setShowAddGroup] = useState(false);
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
 
   const load = useCallback(async (currentToken: string) => {
@@ -56,6 +59,8 @@ export default function DashboardPage() {
       setUser(me);
       const list = await api<Channel[]>("/channels", {}, currentToken);
       setChannels(list);
+      const groupsList = await groupsApi.getGroups(currentToken);
+      setGroups(groupsList);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Unknown error');
     } finally {
@@ -135,6 +140,49 @@ export default function DashboardPage() {
     }
   }, [token, channels]);
 
+  // Group functions
+  const addGroup = useCallback(async (form: GroupCreate) => {
+    if (!token) return;
+    
+    if (!form.name.trim()) {
+      setError('Group name is required');
+      return;
+    }
+    
+    setBusy(true);
+    setError(null);
+    try {
+      const created = await groupsApi.createGroup(form, token);
+      setGroups((prev) => [...prev, created].sort((a,b)=> (a.sort_order-b.sort_order) || (a.id-b.id)));
+      setShowAddGroup(false);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to create group');
+    } finally {
+      setBusy(false);
+    }
+  }, [token]);
+
+  const removeGroup = useCallback(async (id: number) => {
+    if (!token) return;
+    
+    const group = groups.find(g => g.id === id);
+    const groupName = group ? group.name : 'this group';
+    
+    if (!confirm(`Are you sure you want to delete ${groupName}? This will move all channels to "No Group".`)) {
+      return;
+    }
+    
+    setBusy(true);
+    try {
+      await groupsApi.deleteGroup(id, token);
+      setGroups((prev)=> prev.filter(g=>g.id!==id));
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to delete group');
+    } finally {
+      setBusy(false);
+    }
+  }, [token, groups]);
+
   const updateAvatar = useCallback(async (newAvatarUrl: string) => {
     if (!token) return;
     try {
@@ -164,14 +212,17 @@ export default function DashboardPage() {
     }
   }, [token]);
 
-  // Group channels by type or create default groups
-  const groupedChannels = channels.reduce((groups, channel) => {
-    const group = channel.label || 'Other';
-    if (!groups[group]) {
-      groups[group] = [];
+  // Group channels by group_id or create default groups
+  const groupedChannels = channels.reduce((acc, channel) => {
+    const groupId = channel.group_id;
+    const group = groups.find(g => g.id === groupId);
+    const groupName = group ? group.name : 'No Group';
+    
+    if (!acc[groupName]) {
+      acc[groupName] = [];
     }
-    groups[group].push(channel);
-    return groups;
+    acc[groupName].push(channel);
+    return acc;
   }, {} as Record<string, Channel[]>);
 
   if (isLoading) {
@@ -249,21 +300,41 @@ export default function DashboardPage() {
               <h3 className="text-sm font-medium text-slate-300">Groups</h3>
             </div>
             <div className="space-y-2">
-              {Object.keys(groupedChannels).map((groupName) => (
-                <div key={groupName} className="text-sm text-slate-400 py-2 px-3 rounded-lg hover:bg-slate-700 cursor-pointer transition-colors">
-                  {groupName} ({groupedChannels[groupName].length})
+              {groups.map((group) => (
+                <div key={group.id} className="flex items-center justify-between text-sm text-slate-400 py-2 px-3 rounded-lg hover:bg-slate-700 transition-colors">
+                  <span>
+                    {group.name} ({groupedChannels[group.name]?.length || 0})
+                  </span>
+                  <button
+                    onClick={() => removeGroup(group.id)}
+                    className="text-red-400 hover:text-red-300 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Delete group"
+                  >
+                    <Trash2 size={12} />
+                  </button>
                 </div>
               ))}
+              {groupedChannels['No Group'] && (
+                <div className="text-sm text-slate-400 py-2 px-3 rounded-lg">
+                  No Group ({groupedChannels['No Group'].length})
+                </div>
+              )}
             </div>
           </div>
 
           {/* Add Channel Button */}
-          <div className="p-6 border-t border-slate-700">
+          <div className="p-6 border-t border-slate-700 space-y-3">
             <button
               onClick={() => setShowAddChannel(true)}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors font-medium"
             >
               Add Channel
+            </button>
+            <button
+              onClick={() => setShowAddGroup(true)}
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors font-medium"
+            >
+              Add Group
             </button>
           </div>
         </div>
@@ -378,6 +449,7 @@ export default function DashboardPage() {
               onSubmit={addChannel} 
               onCancel={() => setShowAddChannel(false)}
               disabled={busy}
+              groups={groups}
             />
           </div>
         </div>
@@ -399,6 +471,26 @@ export default function DashboardPage() {
               onCancel={() => setEditingChannel(null)}
               onDelete={() => removeChannel(editingChannel.id!)}
               disabled={busy}
+              groups={groups}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Add Group Modal */}
+      {showAddGroup && (
+        <div 
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowAddGroup(false)}
+        >
+          <div 
+            className="bg-slate-800 p-6 rounded-2xl shadow-2xl max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <GroupForm 
+              onSubmit={addGroup} 
+              onCancel={() => setShowAddGroup(false)}
+              disabled={busy}
             />
           </div>
         </div>
@@ -412,13 +504,15 @@ function ChannelForm({
   onSubmit, 
   onCancel, 
   onDelete,
-  disabled 
+  disabled,
+  groups
 }: { 
   channel?: Channel;
   onSubmit: (form: NewChannel) => void; 
   onCancel: () => void;
   onDelete?: () => void;
-  disabled: boolean; 
+  disabled: boolean;
+  groups: Group[];
 }) {
   const [form, setForm] = useState({
     type: channel?.type || "telegram",
@@ -427,7 +521,7 @@ function ChannelForm({
     is_public: channel?.is_public ?? true,
     is_primary: channel?.is_primary ?? false,
     sort_order: channel?.sort_order || 0,
-    group: channel?.label || ""
+    group_id: channel?.group_id || null
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -470,6 +564,22 @@ function ChannelForm({
             value={form.label} 
             onChange={(e)=>setForm({...form, label:e.target.value})} 
           />
+        </div>
+        
+        <div>
+          <label className="block text-sm text-slate-300 mb-2">Group</label>
+          <select 
+            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            value={form.group_id || ""} 
+            onChange={(e)=>setForm({...form, group_id: e.target.value ? Number(e.target.value) : null})}
+          >
+            <option value="">No Group</option>
+            {groups.map((group) => (
+              <option key={group.id} value={group.id}>
+                {group.name}
+              </option>
+            ))}
+          </select>
         </div>
         
         <div>
@@ -616,6 +726,90 @@ function ProfileEditForm({
             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Save
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+function GroupForm({ 
+  onSubmit, 
+  onCancel,
+  disabled 
+}: { 
+  onSubmit: (form: GroupCreate) => void; 
+  onCancel: () => void;
+  disabled: boolean; 
+}) {
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    sort_order: 0
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({ ...form, sort_order: Number(form.sort_order) || 0 });
+    // Reset form after submission
+    setForm({
+      name: "",
+      description: "",
+      sort_order: 0
+    });
+  };
+  
+  return (
+    <div>
+      <h3 className="text-lg font-semibold text-white mb-4">Add New Group</h3>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm text-slate-300 mb-2">Group Name</label>
+          <input 
+            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            placeholder="Enter group name" 
+            value={form.name} 
+            onChange={(e)=>setForm({...form, name:e.target.value})} 
+            required
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm text-slate-300 mb-2">Description (optional)</label>
+          <textarea 
+            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            placeholder="Enter description" 
+            value={form.description} 
+            onChange={(e)=>setForm({...form, description:e.target.value})}
+            rows={3}
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm text-slate-300 mb-2">Sort Order</label>
+          <input 
+            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            type="number" 
+            placeholder="0" 
+            value={form.sort_order} 
+            onChange={(e)=>setForm({...form, sort_order:Number(e.target.value)})} 
+          />
+        </div>
+
+        <div className="flex gap-3 pt-4">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 px-4 py-2 border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-700 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={disabled}
+            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+          >
+            {disabled ? "Creating..." : "Create Group"}
           </button>
         </div>
       </form>

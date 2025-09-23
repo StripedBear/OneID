@@ -14,6 +14,7 @@ export type UserPublic = {
 export type Channel = {
   id: number;
   user_id: number;
+  group_id?: number | null;
   type: string;
   value: string;
   label?: string | null;

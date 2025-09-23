@@ -25,6 +25,7 @@ class Channel(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False)
+    group_id: Mapped[int | None] = mapped_column(ForeignKey("groups.id", ondelete="SET NULL"), nullable=True)
 
     # тип канала и значение (для фронта делаем deeplink/mailto/tel)
     type: Mapped[str] = mapped_column(String(50), nullable=False)  # используем значения из ChannelType
@@ -40,3 +41,4 @@ class Channel(Base):
 
     # обратная связь к пользователю
     user: Mapped["User"] = relationship(back_populates="channels")
+    group: Mapped["Group | None"] = relationship("Group", back_populates="channels")
