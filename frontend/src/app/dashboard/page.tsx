@@ -72,13 +72,20 @@ export default function DashboardPage() {
 
   const addChannel = useCallback(async (form: NewChannel) => {
     if (!token) return;
+    
+    // Basic validation
+    if (!form.value.trim()) {
+      setError('Value is required');
+      return;
+    }
+    
     setBusy(true);
     setError(null);
     try {
       const created = await api<Channel>("/channels", { method:"POST", body: JSON.stringify(form) }, token);
       setChannels((prev) => [...prev, created].sort((a,b)=> (a.sort_order-b.sort_order) || (a.id-b.id)));
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Unknown error');
+      setError(e instanceof Error ? e.message : 'Failed to create channel');
     } finally {
       setBusy(false);
     }
@@ -86,14 +93,24 @@ export default function DashboardPage() {
 
   const removeChannel = useCallback(async (id: number) => {
     if (!token) return;
+    
+    const channel = channels.find(c => c.id === id);
+    const channelName = channel ? (channel.label || channel.type) : 'this channel';
+    
+    if (!confirm(`Are you sure you want to delete ${channelName}?`)) {
+      return;
+    }
+    
     setBusy(true);
     try {
       await api(`/channels/${id}`, { method:"DELETE" }, token);
       setChannels((prev)=> prev.filter(c=>c.id!==id));
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to delete channel');
     } finally {
       setBusy(false);
     }
-  }, [token]);
+  }, [token, channels]);
 
   const updateAvatar = useCallback(async (newAvatarUrl: string) => {
     if (!token) return;
@@ -195,28 +212,32 @@ export default function DashboardPage() {
 
             <section className="grid gap-3">
               <h2 className="text-lg font-semibold text-white">My Channels</h2>
-              <ul className="grid gap-2">
+              <div className="space-y-3">
                 {channels.map((ch) => (
-                  <li key={ch.id} className="flex items-center gap-3 border border-slate-700 rounded-2xl p-3 bg-slate-800">
-                    <ChannelIcon type={ch.type} />
-                    <div className="flex-1">
-                      <div className="font-medium text-white">{ch.label || ch.type}</div>
+                  <div key={ch.id} className="flex items-center gap-4 border border-slate-700 rounded-lg p-4 bg-slate-800">
+                    <div className="flex-shrink-0">
+                      <ChannelIcon type={ch.type} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-white text-sm">{ch.label || ch.type}</div>
                       <div className="text-sm text-slate-400 break-all">{ch.value}</div>
-                      <div className="text-xs text-slate-500">
-                        {ch.is_public ? "Public" : "Private"} {ch.is_primary ? "• Primary" : ""} • Order: {ch.sort_order}
+                      <div className="text-xs text-slate-500 mt-1">
+                        {ch.is_public ? "Public" : "Private"} • Order: {ch.sort_order}
                       </div>
                     </div>
                     <button
                       onClick={() => removeChannel(ch.id)}
-                      className="text-sm border border-slate-600 px-3 py-1 rounded-xl hover:bg-slate-700 text-slate-300"
+                      className="text-sm border border-slate-600 px-3 py-1 rounded-lg hover:bg-slate-700 text-slate-300 transition-colors"
                       disabled={busy}
                     >
                       Delete
                     </button>
-                  </li>
+                  </div>
                 ))}
-                {channels.length === 0 && <li className="text-slate-400">No channels yet</li>}
-              </ul>
+                {channels.length === 0 && (
+                  <div className="text-slate-400 text-center py-8">No channels yet</div>
+                )}
+              </div>
             </section>
 
             <section className="grid gap-3">
@@ -275,52 +296,94 @@ function ChannelForm({ onSubmit, disabled }: { onSubmit: (v: NewChannel) => void
     is_primary: false,
     sort_order: 0
   });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({ ...form, sort_order: Number(form.sort_order) || 0 });
+    // Reset form after submission
+    setForm({
+      type: "telegram",
+      value: "",
+      label: "",
+      is_public: true,
+      is_primary: false,
+      sort_order: 0
+    });
+  };
   
   return (
     <form
-      onSubmit={(e) => { e.preventDefault(); onSubmit({ ...form, sort_order: Number(form.sort_order) || 0 }); }}
-      className="grid md:grid-cols-2 gap-3"
+      onSubmit={handleSubmit}
+      className="space-y-4"
     >
-      <select 
-        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" 
-        value={form.type} 
-        onChange={(e)=>setForm({...form, type:e.target.value})}
-      >
-        {channelTypes.map((t)=> <option key={t} value={t}>{t}</option>)}
-      </select>
-      <input 
-        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-        placeholder="Value (phone, @handle, URL…)" 
-        value={form.value} 
-        onChange={(e)=>setForm({...form, value:e.target.value})} 
-      />
-      <input 
-        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-        placeholder="Label (optional)" 
-        value={form.label} 
-        onChange={(e)=>setForm({...form, label:e.target.value})} 
-      />
-      <input 
-        className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-        type="number" 
-        placeholder="Order" 
-        value={form.sort_order} 
-        onChange={(e)=>setForm({...form, sort_order:Number(e.target.value)})} 
-      />
-      <label className="flex items-center gap-2 text-sm text-slate-300">
-        <input type="checkbox" checked={form.is_public} onChange={(e)=>setForm({...form, is_public:e.target.checked})} /> Public
-      </label>
-      <label className="flex items-center gap-2 text-sm text-slate-300">
-        <input type="checkbox" checked={form.is_primary} onChange={(e)=>setForm({...form, is_primary:e.target.checked})} /> Primary
-      </label>
-      <div className="md:col-span-2">
-        <button 
-          disabled={disabled} 
-          className="w-full bg-white text-slate-900 py-2 px-4 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50"
-        >
-          {disabled ? "Saving..." : "Add"}
-        </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm text-slate-300 mb-2">Channel Type</label>
+          <select 
+            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            value={form.type} 
+            onChange={(e)=>setForm({...form, type:e.target.value})}
+          >
+            {channelTypes.map((t)=> <option key={t} value={t}>{t}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm text-slate-300 mb-2">Value (phone, @handle, URL...)</label>
+          <input 
+            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            placeholder="Enter value" 
+            value={form.value} 
+            onChange={(e)=>setForm({...form, value:e.target.value})} 
+          />
+        </div>
+        <div>
+          <label className="block text-sm text-slate-300 mb-2">Label (optional)</label>
+          <input 
+            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            placeholder="Enter label" 
+            value={form.label} 
+            onChange={(e)=>setForm({...form, label:e.target.value})} 
+          />
+        </div>
+        <div>
+          <label className="block text-sm text-slate-300 mb-2">Order</label>
+          <input 
+            className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+            type="number" 
+            placeholder="0" 
+            value={form.sort_order} 
+            onChange={(e)=>setForm({...form, sort_order:Number(e.target.value)})} 
+          />
+        </div>
       </div>
+      
+      <div className="flex gap-6">
+        <label className="flex items-center gap-2 text-sm text-slate-300">
+          <input 
+            type="checkbox" 
+            checked={form.is_public} 
+            onChange={(e)=>setForm({...form, is_public:e.target.checked})} 
+            className="rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-blue-500"
+          /> 
+          Public
+        </label>
+        <label className="flex items-center gap-2 text-sm text-slate-300">
+          <input 
+            type="checkbox" 
+            checked={form.is_primary} 
+            onChange={(e)=>setForm({...form, is_primary:e.target.checked})} 
+            className="rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-blue-500"
+          /> 
+          Primary
+        </label>
+      </div>
+      
+      <button 
+        disabled={disabled} 
+        className="w-full bg-white text-slate-900 py-3 px-4 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50 font-medium"
+      >
+        {disabled ? "Saving..." : "Add"}
+      </button>
     </form>
   );
 }
