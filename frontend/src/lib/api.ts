@@ -23,6 +23,47 @@ export interface GroupUpdate {
   sort_order?: number;
 }
 
+// Recovery types
+export interface RecoveryStartRequest {
+  email: string;
+}
+
+export interface RecoveryStartResponse {
+  message: string;
+  available_methods: string[];
+  warning?: string;
+}
+
+export interface RecoveryVerifyRequest {
+  email: string;
+  method: string;
+  code?: string;
+  oauth_token?: string;
+}
+
+export interface RecoveryVerifyResponse {
+  access_token: string;
+  token_type: string;
+  message: string;
+}
+
+export interface SecurityInfo {
+  connected: number;
+  total: number;
+  methods: string[];
+  level: string;
+  recommendation: string;
+}
+
+export interface OTPRequest {
+  email: string;
+}
+
+export interface OTPResponse {
+  message: string;
+  expires_in: number;
+}
+
 export async function api<T>(
   path: string,
   opts: RequestInit = {},
@@ -65,5 +106,33 @@ export const groupsApi = {
 
   async deleteGroup(id: number, token: string): Promise<void> {
     return api<void>(`/groups/${id}`, { method: "DELETE" }, token);
+  },
+};
+
+// Recovery API
+export const recoveryApi = {
+  async startRecovery(data: RecoveryStartRequest): Promise<RecoveryStartResponse> {
+    return api<RecoveryStartResponse>("/auth/recover", { 
+      method: "POST", 
+      body: JSON.stringify(data) 
+    });
+  },
+
+  async verifyRecovery(data: RecoveryVerifyRequest): Promise<RecoveryVerifyResponse> {
+    return api<RecoveryVerifyResponse>("/auth/verify", { 
+      method: "POST", 
+      body: JSON.stringify(data) 
+    });
+  },
+
+  async sendOTP(data: OTPRequest): Promise<OTPResponse> {
+    return api<OTPResponse>("/auth/otp", { 
+      method: "POST", 
+      body: JSON.stringify(data) 
+    });
+  },
+
+  async getSecurityInfo(token: string): Promise<SecurityInfo> {
+    return api<SecurityInfo>("/auth/security", { method: "GET" }, token);
   },
 };
