@@ -8,7 +8,7 @@ export default function HomePage() {
         <div className="gradient-background"></div>
       </div>
       
-      <div className="relative z-10 flex items-center justify-center h-[30vh]">
+      <div className="relative z-10 flex items-center justify-center min-h-screen">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-8">
