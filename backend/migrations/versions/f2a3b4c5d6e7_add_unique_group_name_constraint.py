@@ -17,7 +17,40 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Add unique constraint for group name per user
+    # First, update channels to point to the correct groups (lowest ID for each name+user combination)
+    connection = op.get_bind()
+    
+    # Update channels to point to the group with the lowest ID for each name+user combination
+    connection.execute(sa.text("""
+        UPDATE channels 
+        SET group_id = (
+            SELECT MIN(g2.id) 
+            FROM groups g2 
+            WHERE g2.name = (
+                SELECT g1.name 
+                FROM groups g1 
+                WHERE g1.id = channels.group_id
+            ) 
+            AND g2.user_id = (
+                SELECT g1.user_id 
+                FROM groups g1 
+                WHERE g1.id = channels.group_id
+            )
+        )
+        WHERE group_id IS NOT NULL
+    """))
+    
+    # Now remove duplicate groups (keep the one with the lowest ID)
+    connection.execute(sa.text("""
+        DELETE FROM groups 
+        WHERE id NOT IN (
+            SELECT MIN(id) 
+            FROM groups 
+            GROUP BY name, user_id
+        )
+    """))
+    
+    # Now add unique constraint for group name per user
     op.create_unique_constraint('uq_group_name_user', 'groups', ['name', 'user_id'])
 
 
