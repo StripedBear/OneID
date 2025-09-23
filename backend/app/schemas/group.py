@@ -30,7 +30,7 @@ class Group(GroupBase):
 
 
 class GroupWithChannels(Group):
-    channels: list["Channel"] = []
+    channels: list = []
 
     class Config:
         from_attributes = True
