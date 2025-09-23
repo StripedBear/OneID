@@ -161,8 +161,21 @@ export default function UserProfile({ params }: UserProfileProps) {
     );
   }
 
-  const { user, channels } = profile;
+  const { user, channels, groups } = profile;
   const publicChannels = channels.filter(ch => ch.is_public);
+
+  // Group channels by group_id
+  const groupedChannels = publicChannels.reduce((acc, channel) => {
+    const groupId = channel.group_id;
+    const group = groups.find(g => g.id === groupId);
+    const groupName = group ? group.name : 'Other';
+    
+    if (!acc[groupName]) {
+      acc[groupName] = [];
+    }
+    acc[groupName].push(channel);
+    return acc;
+  }, {} as Record<string, typeof publicChannels>);
 
   return (
     <div className="bg-slate-900">
@@ -215,13 +228,20 @@ export default function UserProfile({ params }: UserProfileProps) {
             )}
             
             {publicChannels.length > 0 ? (
-              <div className="space-y-6">
+              <div className="space-y-8">
                 <h2 className="text-xl font-semibold text-white mb-6">Contact Channels</h2>
-                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 justify-items-center">
-                  {publicChannels.map((channel) => (
-                    <SocialChannel key={channel.id} channel={channel} />
-                  ))}
-                </div>
+                {Object.entries(groupedChannels).map(([groupName, groupChannels]) => (
+                  <div key={groupName} className="space-y-4">
+                    <h3 className="text-lg font-medium text-slate-300 border-b border-slate-700 pb-2">
+                      {groupName}
+                    </h3>
+                    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 justify-items-center">
+                      {groupChannels.map((channel) => (
+                        <SocialChannel key={channel.id} channel={channel} />
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="text-slate-400">

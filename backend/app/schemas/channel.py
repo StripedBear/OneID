@@ -9,6 +9,7 @@ class ChannelBase(BaseModel):
     is_public: bool = True
     is_primary: bool = False
     sort_order: int = 0
+    group_id: int | None = None
 
 
 class ChannelCreate(ChannelBase):
@@ -22,11 +23,13 @@ class ChannelUpdate(BaseModel):
     is_public: bool | None = None
     is_primary: bool | None = None
     sort_order: int | None = None
+    group_id: int | None = None
 
 
 class ChannelPublic(BaseModel):
     id: int
     user_id: int
+    group_id: int | None
     type: str
     value: str
     label: str | None

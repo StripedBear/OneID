@@ -25,9 +25,20 @@ export type Channel = {
   updated_at: string;
 };
 
+export type Group = {
+  id: number;
+  name: string;
+  description?: string;
+  user_id: number;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
 export type PublicProfile = {
   user: UserPublic;
   channels: Channel[];
+  groups: Group[];
 };
 
 export type TokenResponse = {

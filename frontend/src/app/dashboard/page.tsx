@@ -156,7 +156,8 @@ export default function DashboardPage() {
       setGroups((prev) => [...prev, created].sort((a,b)=> (a.sort_order-b.sort_order) || (a.id-b.id)));
       setShowAddGroup(false);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to create group');
+      const errorMessage = e instanceof Error ? e.message : 'Failed to create group';
+      setError(errorMessage);
     } finally {
       setBusy(false);
     }
