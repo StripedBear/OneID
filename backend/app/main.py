@@ -12,6 +12,7 @@ from app.api.routes import public as public_routes
 from app.api.routes import contacts as contacts_routes
 from app.api.routes import oauth as oauth_routes
 from app.api.routes import groups as groups_routes
+from app.api.routes import recovery as recovery_routes
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -51,5 +52,6 @@ api_router.include_router(public_routes.router)
 api_router.include_router(contacts_routes.router, prefix="/contacts", tags=["contacts"])
 api_router.include_router(oauth_routes.router)
 api_router.include_router(groups_routes.router, prefix="/groups", tags=["groups"])
+api_router.include_router(recovery_routes.router)
 
 app.include_router(api_router)
