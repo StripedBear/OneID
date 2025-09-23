@@ -14,8 +14,7 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const code = searchParams.get('code');
-        const state = searchParams.get('state');
+        const token = searchParams.get('token');
         const error = searchParams.get('error');
 
         if (error) {
@@ -24,37 +23,15 @@ export default function AuthCallbackPage() {
           return;
         }
 
-        if (!code) {
-          setError('No authorization code received');
-          setLoading(false);
-          return;
-        }
-
-        // Get the provider from the URL params
-        const provider = params.provider as string;
-
-        if (!['google', 'github', 'discord'].includes(provider)) {
-          setError('Invalid OAuth provider');
-          setLoading(false);
-          return;
-        }
-
-        // Exchange code for token via backend
-        const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://oneid-m4s5.onrender.com/api/v1';
-        const response = await fetch(`${backendUrl}/oauth/${provider}/callback?code=${code}&state=${state || ''}`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to authenticate');
-        }
-
-        const data = await response.json();
-        
-        if (data.access_token) {
-          setToken(data.access_token);
-          router.push('/dashboard');
-        } else {
+        if (!token) {
           setError('No access token received');
+          setLoading(false);
+          return;
         }
+
+        // Set token and redirect to dashboard
+        setToken(token);
+        router.push('/dashboard');
       } catch (err) {
         console.error('OAuth callback error:', err);
         setError(err instanceof Error ? err.message : 'Authentication failed');
@@ -64,7 +41,7 @@ export default function AuthCallbackPage() {
     };
 
     handleCallback();
-  }, [searchParams, router, params]);
+  }, [searchParams, router]);
 
   if (loading) {
     return (

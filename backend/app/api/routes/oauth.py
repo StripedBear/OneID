@@ -143,7 +143,7 @@ async def google_callback(request: Request, db: Session = Depends(get_db)):
     return TokenResponse(access_token=access_token, token_type="bearer")
 
 
-@router.get("/github/callback", response_model=TokenResponse)
+@router.get("/github/callback")
 async def github_callback(request: Request, db: Session = Depends(get_db)):
     """Handle GitHub OAuth callback."""
     # Get authorization code from query params
@@ -194,7 +194,9 @@ async def github_callback(request: Request, db: Session = Depends(get_db)):
     user = crud_user.create_oauth_user(db, oauth_data)
     access_token = create_access_token(subject=user.id)
     
-    return TokenResponse(access_token=access_token, token_type="bearer")
+    # Redirect to frontend with token
+    redirect_url = f"{settings.FRONTEND_URL}/auth/callback/github?token={access_token}"
+    return RedirectResponse(url=redirect_url)
 
 
 @router.get("/discord/callback", response_model=TokenResponse)

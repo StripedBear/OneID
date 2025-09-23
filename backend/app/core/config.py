@@ -15,7 +15,10 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
     # CORS Configuration
-    CORS_ORIGINS: list[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: list[str] = ["http://localhost:3000", "https://one-id-mu.vercel.app"]
+    
+    # Frontend Configuration
+    FRONTEND_URL: str = "https://one-id-mu.vercel.app"
 
     # Supabase Configuration
     SUPABASE_URL: str = ""
