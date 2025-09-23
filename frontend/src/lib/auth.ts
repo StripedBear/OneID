@@ -12,3 +12,7 @@ export function getToken(): string | null {
 export function clearToken() {
   if (typeof window !== "undefined") localStorage.removeItem(KEY);
 }
+
+// Legacy functions for backward compatibility
+// These should be replaced with useAuth hook in components
+export { setToken as setTokenLegacy, getToken as getTokenLegacy, clearToken as clearTokenLegacy };

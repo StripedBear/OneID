@@ -1,16 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { getToken, clearToken } from "@/lib/auth";
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 export default function NavLinks() {
-  const [hasToken, setHasToken] = useState(false);
+  const { isAuthenticated, clearToken } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
-
-  useEffect(() => { setHasToken(!!getToken()); }, []);
 
   const handleLogout = () => {
     clearToken();
@@ -22,11 +20,11 @@ export default function NavLinks() {
     <>
       {/* Desktop Menu */}
       <nav className="hidden md:flex text-sm items-center gap-4">
-        {!hasToken && <Link href="/login" className="hover:underline">Login</Link>}
-        {!hasToken && <Link href="/register" className="hover:underline">Sign Up</Link>}
-        {hasToken && <Link href="/dashboard" className="hover:underline">Dashboard</Link>}
-        {hasToken && <Link href="/dashboard/contacts" className="hover:underline">Contacts</Link>}
-        {hasToken && (
+        {!isAuthenticated && <Link href="/login" className="hover:underline">Login</Link>}
+        {!isAuthenticated && <Link href="/register" className="hover:underline">Sign Up</Link>}
+        {isAuthenticated && <Link href="/dashboard" className="hover:underline">Dashboard</Link>}
+        {isAuthenticated && <Link href="/dashboard/contacts" className="hover:underline">Contacts</Link>}
+        {isAuthenticated && (
           <button
             onClick={handleLogout}
             className="text-sm border border-slate-700 px-3 py-1 rounded-xl hover:bg-slate-800"
@@ -56,7 +54,7 @@ export default function NavLinks() {
         <div className="md:hidden fixed inset-0 bg-black/50 z-50" onClick={() => setIsMobileMenuOpen(false)}>
           <div className="absolute top-0 right-0 h-full w-64 bg-slate-900 border-l border-slate-700 p-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex flex-col gap-4 mt-8">
-              {!hasToken && (
+              {!isAuthenticated && (
                 <>
                   <Link href="/login" className="text-lg hover:text-blue-400" onClick={() => setIsMobileMenuOpen(false)}>
                     Login
@@ -66,7 +64,7 @@ export default function NavLinks() {
                   </Link>
                 </>
               )}
-              {hasToken && (
+              {isAuthenticated && (
                 <>
                   <Link href="/dashboard" className="text-lg hover:text-blue-400" onClick={() => setIsMobileMenuOpen(false)}>
                     Dashboard

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { api } from "@/lib/api";
-import { getToken } from "@/lib/auth";
+import { useAuth } from "@/contexts/AuthContext";
 import type { UserPublic, Channel } from "@/types";
 import { ChannelIcon } from "@/components/ChannelIcon";
 import AvatarButton from "@/components/AvatarButton";
@@ -39,11 +39,11 @@ type NewChannel = {
 const channelTypes = ["phone","email","telegram","whatsapp","signal","instagram","twitter","facebook","linkedin","website","github","custom"];
 
 export default function DashboardPage() {
+  const { token, isAuthenticated } = useAuth();
   const [user, setUser] = useState<UserPublic | null>(null);
   const [channels, setChannels] = useState<Channel[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showQR, setShowQR] = useState(false);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
@@ -63,15 +63,12 @@ export default function DashboardPage() {
 
   // Initialize token and load data
   useEffect(() => {
-    const currentToken = getToken();
-    setToken(currentToken);
-    
-    if (currentToken) {
-      load(currentToken);
+    if (token && isAuthenticated) {
+      load(token);
     } else {
       setIsLoading(false);
     }
-  }, [load]);
+  }, [token, isAuthenticated, load]);
 
   const addChannel = useCallback(async (form: NewChannel) => {
     if (!token) return;
@@ -139,7 +136,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!token) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
