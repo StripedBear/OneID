@@ -32,6 +32,7 @@ def create_channel(
         is_public=payload.is_public,
         is_primary=payload.is_primary,
         sort_order=payload.sort_order,
+        group_id=payload.group_id,
     )
     return ch
 
@@ -66,6 +67,7 @@ def update_channel(
         is_public=payload.is_public,
         is_primary=payload.is_primary,
         sort_order=payload.sort_order,
+        group_id=payload.group_id,
     )
     return ch
 
