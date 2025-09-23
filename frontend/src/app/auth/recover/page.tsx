@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { recoveryApi } from "@/lib/api";
@@ -41,7 +41,7 @@ const RECOVERY_METHODS: Record<string, RecoveryMethod> = {
   }
 };
 
-export default function RecoveryPage() {
+function RecoveryPageContent() {
   const [email, setEmail] = useState("");
   const [step, setStep] = useState<"email" | "methods" | "verify">("email");
   const [availableMethods, setAvailableMethods] = useState<string[]>([]);
@@ -279,5 +279,17 @@ export default function RecoveryPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RecoveryPage() {
+  return (
+    <Suspense fallback={
+      <div className="bg-slate-900 flex items-center justify-center py-16">
+        <div className="text-slate-400">Loading...</div>
+      </div>
+    }>
+      <RecoveryPageContent />
+    </Suspense>
   );
 }
