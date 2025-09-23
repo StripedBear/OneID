@@ -8,7 +8,7 @@ from app.models.channel import Channel
 from app.models.group import Group
 from app.schemas.user import UserPublic
 from app.schemas.channel import ChannelPublic
-from app.schemas.group import Group
+from app.schemas.group import Group as GroupSchema
 
 router = APIRouter(prefix="/public", tags=["public"])
 
@@ -45,5 +45,5 @@ def public_profile(username: str, db: Session = Depends(get_db)) -> dict:
     return {
         "user": user_data,
         "channels": [ChannelPublic.model_validate(ch).model_dump() for ch in channels],
-        "groups": [Group.model_validate(g).model_dump() for g in groups],
+        "groups": [GroupSchema.model_validate(g).model_dump() for g in groups],
     }
