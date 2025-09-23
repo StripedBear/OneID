@@ -31,6 +31,92 @@ const getDisplayName = (user: any): string => {
   return user.username;
 };
 
+// Helper function to generate vCard
+const generateVCard = (user: any, channels: any[]): string => {
+  const publicChannels = channels.filter(ch => ch.is_public);
+  
+  let vcard = "BEGIN:VCARD\n";
+  vcard += "VERSION:3.0\n";
+  
+  // Name fields
+  const fullName = getDisplayName(user);
+  vcard += `FN:${fullName}\n`;
+  
+  if (user.first_name || user.last_name) {
+    const firstName = user.first_name || "";
+    const lastName = user.last_name || "";
+    vcard += `N:${lastName};${firstName};;;\n`;
+  }
+  
+  // Add channels
+  publicChannels.forEach(channel => {
+    switch (channel.type) {
+      case 'phone':
+        vcard += `TEL:${channel.value}\n`;
+        break;
+      case 'email':
+        vcard += `EMAIL:${channel.value}\n`;
+        break;
+      case 'website':
+        vcard += `URL:${channel.value}\n`;
+        break;
+      case 'telegram':
+        vcard += `X-TELEGRAM:${channel.value}\n`;
+        break;
+      case 'whatsapp':
+        vcard += `X-WHATSAPP:${channel.value}\n`;
+        break;
+      case 'instagram':
+        vcard += `X-INSTAGRAM:${channel.value}\n`;
+        break;
+      case 'twitter':
+        vcard += `X-TWITTER:${channel.value}\n`;
+        break;
+      case 'facebook':
+        vcard += `X-FACEBOOK:${channel.value}\n`;
+        break;
+      case 'linkedin':
+        vcard += `X-LINKEDIN:${channel.value}\n`;
+        break;
+      case 'github':
+        vcard += `X-GITHUB:${channel.value}\n`;
+        break;
+      case 'signal':
+        vcard += `X-SIGNAL:${channel.value}\n`;
+        break;
+      case 'custom':
+        vcard += `X-CUSTOM-${channel.label || 'CONTACT'}:${channel.value}\n`;
+        break;
+    }
+  });
+  
+  // Add profile URL
+  const profileUrl = `${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/${user.username}`;
+  vcard += `URL:${profileUrl}\n`;
+  
+  // Add bio as note
+  if (user.bio) {
+    vcard += `NOTE:${user.bio}\n`;
+  }
+  
+  vcard += "END:VCARD";
+  return vcard;
+};
+
+// Helper function to download vCard
+const downloadVCard = (user: any, channels: any[]) => {
+  const vcardContent = generateVCard(user, channels);
+  const blob = new Blob([vcardContent], { type: 'text/vcard' });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${user.username}.vcf`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
+
 export default function UserProfile({ params }: UserProfileProps) {
   const { username } = params;
   const [profile, setProfile] = useState<PublicProfile | null>(null);
@@ -83,7 +169,7 @@ export default function UserProfile({ params }: UserProfileProps) {
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto bg-slate-800 rounded-2xl shadow-2xl p-8">
           <div className="text-center">
-            {/* Avatar with QR overlay - CENTERED */}
+            {/* Avatar with Export and QR overlays - CENTERED */}
             <div className="flex justify-center mb-6">
               <div className="relative">
                 <Avatar 
@@ -91,10 +177,21 @@ export default function UserProfile({ params }: UserProfileProps) {
                   alt={getDisplayName(user)} 
                   size={120}
                 />
+                {/* Export icon overlay - BOTTOM LEFT */}
+                <button 
+                  onClick={() => downloadVCard(user, channels)}
+                  className="absolute -bottom-1 -left-1 bg-green-600 hover:bg-green-700 rounded-full p-2 border-2 border-white shadow-lg transition-colors cursor-pointer"
+                  title="Export contact to phone"
+                >
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </button>
                 {/* QR icon overlay - BOTTOM RIGHT */}
                 <button 
                   onClick={() => setIsQrModalOpen(true)}
                   className="absolute -bottom-1 -right-1 bg-blue-600 hover:bg-blue-700 rounded-full p-2 border-2 border-white shadow-lg transition-colors cursor-pointer"
+                  title="Show QR code"
                 >
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
