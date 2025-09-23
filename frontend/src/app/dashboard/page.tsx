@@ -9,7 +9,6 @@ import AvatarButton from "@/components/AvatarButton";
 import QRCodeCard from "@/components/QRCodeCard";
 import Link from "next/link";
 
-
 // Helper function to get display name
 const getDisplayName = (user: UserPublic): string => {
   if (user.first_name && user.last_name) {
@@ -34,6 +33,7 @@ type NewChannel = {
   is_public: boolean;
   is_primary: boolean;
   sort_order: number;
+  group?: string;
 };
 
 const channelTypes = ["phone","email","telegram","whatsapp","signal","instagram","twitter","facebook","linkedin","website","github","custom"];
@@ -47,6 +47,8 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showQR, setShowQR] = useState(false);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
+  const [showAddChannel, setShowAddChannel] = useState(false);
+  const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
 
   const load = useCallback(async (currentToken: string) => {
     try {
@@ -84,8 +86,28 @@ export default function DashboardPage() {
     try {
       const created = await api<Channel>("/channels", { method:"POST", body: JSON.stringify(form) }, token);
       setChannels((prev) => [...prev, created].sort((a,b)=> (a.sort_order-b.sort_order) || (a.id-b.id)));
+      setShowAddChannel(false);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to create channel');
+    } finally {
+      setBusy(false);
+    }
+  }, [token]);
+
+  const updateChannel = useCallback(async (id: number, form: NewChannel) => {
+    if (!token) return;
+    
+    setBusy(true);
+    setError(null);
+    try {
+      const updated = await api<Channel>(`/channels/${id}`, { 
+        method: "PUT", 
+        body: JSON.stringify(form) 
+      }, token);
+      setChannels((prev) => prev.map(c => c.id === id ? updated : c));
+      setEditingChannel(null);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to update channel');
     } finally {
       setBusy(false);
     }
@@ -105,6 +127,7 @@ export default function DashboardPage() {
     try {
       await api(`/channels/${id}`, { method:"DELETE" }, token);
       setChannels((prev)=> prev.filter(c=>c.id!==id));
+      setEditingChannel(null);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to delete channel');
     } finally {
@@ -116,7 +139,6 @@ export default function DashboardPage() {
     if (!token) return;
     try {
       console.log('updateAvatar called with:', newAvatarUrl);
-      // Update local state immediately for better UX
       setUser(prev => {
         const updated = prev ? { ...prev, avatar_url: newAvatarUrl } : null;
         console.log('Updated user state:', updated);
@@ -142,6 +164,16 @@ export default function DashboardPage() {
     }
   }, [token]);
 
+  // Group channels by type or create default groups
+  const groupedChannels = channels.reduce((groups, channel) => {
+    const group = channel.label || 'Other';
+    if (!groups[group]) {
+      groups[group] = [];
+    }
+    groups[group].push(channel);
+    return groups;
+  }, {} as Record<string, Channel[]>);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
@@ -165,10 +197,12 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="bg-slate-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid gap-6">
+    <div className="min-h-screen bg-slate-900">
+      <div className="flex h-screen">
+        {/* Left Sidebar */}
+        <div className="w-80 bg-slate-800 border-r border-slate-700 flex flex-col">
+          {/* Profile Section */}
+          <div className="p-6 border-b border-slate-700">
             <div className="flex flex-col items-center gap-4">
               <div className="relative">
                 <AvatarButton 
@@ -189,10 +223,10 @@ export default function DashboardPage() {
                 )}
               </div>
               <div className="text-center">
-                <div className="text-xl font-semibold text-white">{user ? getDisplayName(user) : ''}</div>
+                <div className="text-lg font-semibold text-white">{user ? getDisplayName(user) : ''}</div>
                 <div className="text-slate-400 text-sm">{user?.email}</div>
                 {user && (
-                  <div className="text-sm mt-2 text-slate-300">
+                  <div className="text-xs mt-2 text-slate-300">
                     Public profile:{" "}
                     <Link className="underline text-blue-400 hover:text-blue-300" href={`/${user.username}`} target="_blank" rel="noreferrer">
                       /{user.username}
@@ -207,116 +241,206 @@ export default function DashboardPage() {
                 </button>
               </div>
             </div>
+          </div>
 
-            {error && <div className="text-red-400 text-sm bg-red-900/20 border border-red-700 rounded-lg p-3">{error}</div>}
+          {/* Groups Section */}
+          <div className="flex-1 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-slate-300">Groups</h3>
+            </div>
+            <div className="space-y-2">
+              {Object.keys(groupedChannels).map((groupName) => (
+                <div key={groupName} className="text-sm text-slate-400 py-2 px-3 rounded-lg hover:bg-slate-700 cursor-pointer transition-colors">
+                  {groupName} ({groupedChannels[groupName].length})
+                </div>
+              ))}
+            </div>
+          </div>
 
-            <section className="grid gap-3">
-              <h2 className="text-lg font-semibold text-white">My Channels</h2>
-              <div className="space-y-3">
-                {channels.map((ch) => (
-                  <div key={ch.id} className="flex items-center gap-4 border border-slate-700 rounded-lg p-4 bg-slate-800">
-                    <div className="flex-shrink-0">
-                      <ChannelIcon type={ch.type} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-white text-sm">{ch.label || ch.type}</div>
-                      <div className="text-sm text-slate-400 break-all">{ch.value}</div>
-                      <div className="text-xs text-slate-500 mt-1">
-                        {ch.is_public ? "Public" : "Private"} • Order: {ch.sort_order}
+          {/* Add Channel Button */}
+          <div className="p-6 border-t border-slate-700">
+            <button
+              onClick={() => setShowAddChannel(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors font-medium"
+            >
+              Add Channel
+            </button>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-8">
+            {error && (
+              <div className="mb-6 text-red-400 text-sm bg-red-900/20 border border-red-700 rounded-lg p-3">
+                {error}
+              </div>
+            )}
+
+            {/* Channel Groups */}
+            <div className="space-y-8">
+              {Object.entries(groupedChannels).map(([groupName, groupChannels]) => (
+                <div key={groupName} className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                  <h2 className="text-xl font-semibold text-white mb-6">{groupName}</h2>
+                  <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {groupChannels.map((channel) => (
+                      <div
+                        key={channel.id}
+                        onClick={() => setEditingChannel(channel)}
+                        className="bg-slate-700 hover:bg-slate-600 rounded-lg p-4 cursor-pointer transition-all duration-200 hover:scale-105 border border-slate-600 hover:border-slate-500"
+                      >
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="w-12 h-12 flex items-center justify-center">
+                            <ChannelIcon type={channel.type} />
+                          </div>
+                          <div className="text-center">
+                            <div className="text-xs text-slate-300 font-medium">{channel.label || channel.type}</div>
+                            <div className="text-xs text-slate-400 truncate w-full">{channel.value}</div>
+                            <div className="flex gap-1 mt-1">
+                              {channel.is_public && (
+                                <span className="text-xs bg-green-600 text-white px-1 rounded">P</span>
+                              )}
+                              {channel.is_primary && (
+                                <span className="text-xs bg-blue-600 text-white px-1 rounded">★</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <button
-                      onClick={() => removeChannel(ch.id)}
-                      className="text-sm border border-slate-600 px-3 py-1 rounded-lg hover:bg-slate-700 text-slate-300 transition-colors"
-                      disabled={busy}
-                    >
-                      Delete
-                    </button>
+                    ))}
                   </div>
-                ))}
-                {channels.length === 0 && (
-                  <div className="text-slate-400 text-center py-8">No channels yet</div>
-                )}
-              </div>
-            </section>
-
-            <section className="grid gap-3">
-              <h2 className="text-lg font-semibold text-white">Add Channel</h2>
-              <ChannelForm onSubmit={addChannel} disabled={busy} />
-            </section>
-
-            {/* QR Code Modal */}
-            {showQR && user && (
-              <div 
-                className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-                onClick={() => setShowQR(false)}
-              >
-                <div 
-                  className="bg-slate-800 p-6 rounded-2xl shadow-2xl"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <QRCodeCard 
-                    url={`${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/${user.username}`}
-                  />
                 </div>
-              </div>
-            )}
+              ))}
 
-            {/* Profile Edit Modal */}
-            {showProfileEdit && user && (
-              <div 
-                className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-                onClick={() => setShowProfileEdit(false)}
-              >
-                <div 
-                  className="bg-slate-800 p-6 rounded-2xl shadow-2xl max-w-md w-full"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <ProfileEditForm 
-                    user={user} 
-                    onSubmit={updateProfile} 
-                    onCancel={() => setShowProfileEdit(false)}
-                  />
+              {channels.length === 0 && (
+                <div className="text-center py-16">
+                  <div className="text-slate-400 mb-4">No channels yet</div>
+                  <button
+                    onClick={() => setShowAddChannel(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg transition-colors"
+                  >
+                    Add your first channel
+                  </button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* QR Code Modal */}
+      {showQR && user && (
+        <div 
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowQR(false)}
+        >
+          <div 
+            className="bg-slate-800 p-6 rounded-2xl shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <QRCodeCard 
+              url={`${process.env.NEXT_PUBLIC_FRONTEND_URL || 'http://localhost:3000'}/${user.username}`}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Profile Edit Modal */}
+      {showProfileEdit && user && (
+        <div 
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowProfileEdit(false)}
+        >
+          <div 
+            className="bg-slate-800 p-6 rounded-2xl shadow-2xl max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ProfileEditForm 
+              user={user} 
+              onSubmit={updateProfile} 
+              onCancel={() => setShowProfileEdit(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Add Channel Modal */}
+      {showAddChannel && (
+        <div 
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          onClick={() => setShowAddChannel(false)}
+        >
+          <div 
+            className="bg-slate-800 p-6 rounded-2xl shadow-2xl max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ChannelForm 
+              onSubmit={addChannel} 
+              onCancel={() => setShowAddChannel(false)}
+              disabled={busy}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Edit Channel Modal */}
+      {editingChannel && (
+        <div 
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+          onClick={() => setEditingChannel(null)}
+        >
+          <div 
+            className="bg-slate-800 p-6 rounded-2xl shadow-2xl max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ChannelForm 
+              channel={editingChannel}
+              onSubmit={(form) => updateChannel(editingChannel.id!, form)} 
+              onCancel={() => setEditingChannel(null)}
+              onDelete={() => removeChannel(editingChannel.id!)}
+              disabled={busy}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function ChannelForm({ onSubmit, disabled }: { onSubmit: (v: NewChannel) => void; disabled: boolean; }) {
+function ChannelForm({ 
+  channel, 
+  onSubmit, 
+  onCancel, 
+  onDelete,
+  disabled 
+}: { 
+  channel?: Channel;
+  onSubmit: (form: NewChannel) => void; 
+  onCancel: () => void;
+  onDelete?: () => void;
+  disabled: boolean; 
+}) {
   const [form, setForm] = useState({
-    type: "telegram",
-    value: "",
-    label: "",
-    is_public: true,
-    is_primary: false,
-    sort_order: 0
+    type: channel?.type || "telegram",
+    value: channel?.value || "",
+    label: channel?.label || "",
+    is_public: channel?.is_public ?? true,
+    is_primary: channel?.is_primary ?? false,
+    sort_order: channel?.sort_order || 0,
+    group: channel?.label || ""
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({ ...form, sort_order: Number(form.sort_order) || 0 });
-    // Reset form after submission
-    setForm({
-      type: "telegram",
-      value: "",
-      label: "",
-      is_public: true,
-      is_primary: false,
-      sort_order: 0
-    });
   };
   
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-4"
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <h2 className="text-xl font-semibold mb-6 text-center text-white">
+        {channel ? 'Edit Channel' : 'Add Channel'}
+      </h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm text-slate-300 mb-2">Channel Type</label>
           <select 
@@ -327,6 +451,7 @@ function ChannelForm({ onSubmit, disabled }: { onSubmit: (v: NewChannel) => void
             {channelTypes.map((t)=> <option key={t} value={t}>{t}</option>)}
           </select>
         </div>
+        
         <div>
           <label className="block text-sm text-slate-300 mb-2">Value (phone, @handle, URL...)</label>
           <input 
@@ -336,6 +461,7 @@ function ChannelForm({ onSubmit, disabled }: { onSubmit: (v: NewChannel) => void
             onChange={(e)=>setForm({...form, value:e.target.value})} 
           />
         </div>
+        
         <div>
           <label className="block text-sm text-slate-300 mb-2">Label (optional)</label>
           <input 
@@ -345,6 +471,7 @@ function ChannelForm({ onSubmit, disabled }: { onSubmit: (v: NewChannel) => void
             onChange={(e)=>setForm({...form, label:e.target.value})} 
           />
         </div>
+        
         <div>
           <label className="block text-sm text-slate-300 mb-2">Order</label>
           <input 
@@ -355,36 +482,55 @@ function ChannelForm({ onSubmit, disabled }: { onSubmit: (v: NewChannel) => void
             onChange={(e)=>setForm({...form, sort_order:Number(e.target.value)})} 
           />
         </div>
-      </div>
-      
-      <div className="flex gap-6">
-        <label className="flex items-center gap-2 text-sm text-slate-300">
-          <input 
-            type="checkbox" 
-            checked={form.is_public} 
-            onChange={(e)=>setForm({...form, is_public:e.target.checked})} 
-            className="rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-blue-500"
-          /> 
-          Public
-        </label>
-        <label className="flex items-center gap-2 text-sm text-slate-300">
-          <input 
-            type="checkbox" 
-            checked={form.is_primary} 
-            onChange={(e)=>setForm({...form, is_primary:e.target.checked})} 
-            className="rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-blue-500"
-          /> 
-          Primary
-        </label>
-      </div>
-      
-      <button 
-        disabled={disabled} 
-        className="w-full bg-white text-slate-900 py-3 px-4 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50 font-medium"
-      >
-        {disabled ? "Saving..." : "Add"}
-      </button>
-    </form>
+        
+        <div className="flex gap-6">
+          <label className="flex items-center gap-2 text-sm text-slate-300">
+            <input 
+              type="checkbox" 
+              checked={form.is_public} 
+              onChange={(e)=>setForm({...form, is_public:e.target.checked})} 
+              className="rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-blue-500"
+            /> 
+            Public
+          </label>
+          <label className="flex items-center gap-2 text-sm text-slate-300">
+            <input 
+              type="checkbox" 
+              checked={form.is_primary} 
+              onChange={(e)=>setForm({...form, is_primary:e.target.checked})} 
+              className="rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-blue-500"
+            /> 
+            Primary
+          </label>
+        </div>
+        
+        <div className="flex gap-3 pt-4">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="flex-1 px-4 py-2 border border-slate-600 rounded-lg text-slate-300 hover:bg-slate-700 transition-colors"
+          >
+            Cancel
+          </button>
+          {onDelete && (
+            <button
+              type="button"
+              onClick={onDelete}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Delete
+            </button>
+          )}
+          <button 
+            type="submit"
+            disabled={disabled} 
+            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          >
+            {disabled ? "Saving..." : (channel ? "Update" : "Add")}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
 
