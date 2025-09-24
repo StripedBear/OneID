@@ -37,16 +37,35 @@ def upgrade() -> None:
     """))
     
     # Remove group_id column from channels table
-    op.drop_constraint('fk_channels_group_id_groups', 'channels', type_='foreignkey')
-    op.drop_index('ix_channels_group_id', 'channels')
+    # Check if constraint exists before dropping it
+    inspector = sa.inspect(connection)
+    constraints = inspector.get_foreign_keys('channels')
+    constraint_name = None
+    for constraint in constraints:
+        if 'group_id' in constraint.get('constrained_columns', []):
+            constraint_name = constraint.get('name')
+            break
+    
+    if constraint_name:
+        op.drop_constraint(constraint_name, 'channels', type_='foreignkey')
+    
+    # Drop index if it exists
+    indexes = inspector.get_indexes('channels')
+    index_name = None
+    for index in indexes:
+        if 'group_id' in index.get('column_names', []):
+            index_name = index.get('name')
+            break
+    
+    if index_name:
+        op.drop_index(index_name, 'channels')
+    
     op.drop_column('channels', 'group_id')
 
 
 def downgrade() -> None:
     # Add group_id column back to channels table
     op.add_column('channels', sa.Column('group_id', sa.Integer(), nullable=True))
-    op.create_foreign_key('fk_channels_group_id_groups', 'channels', 'groups', ['group_id'], ['id'], ondelete='SET NULL')
-    op.create_index('ix_channels_group_id', 'channels', ['group_id'], unique=False)
     
     # Migrate data back from channel_groups to group_id
     connection = op.get_bind()
@@ -64,6 +83,10 @@ def downgrade() -> None:
             WHERE channel_groups.channel_id = channels.id
         )
     """))
+    
+    # Add foreign key constraint
+    op.create_foreign_key('fk_channels_group_id_groups', 'channels', 'groups', ['group_id'], ['id'], ondelete='SET NULL')
+    op.create_index('ix_channels_group_id', 'channels', ['group_id'], unique=False)
     
     # Drop channel_groups table
     op.drop_table('channel_groups')
