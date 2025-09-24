@@ -9,7 +9,7 @@ class ChannelBase(BaseModel):
     is_public: bool = False  # Changed to False
     is_primary: bool = False
     sort_order: int = 0
-    group_id: int | None = None
+    group_ids: list[int] = Field(default_factory=list, description="Список ID групп")
 
 
 class ChannelCreate(ChannelBase):
@@ -23,13 +23,12 @@ class ChannelUpdate(BaseModel):
     is_public: bool | None = None
     is_primary: bool | None = None
     sort_order: int | None = None
-    group_id: int | None = None
+    group_ids: list[int] | None = None
 
 
 class ChannelPublic(BaseModel):
     id: int
     user_id: int
-    group_id: int | None
     type: str
     value: str
     label: str | None
@@ -38,6 +37,7 @@ class ChannelPublic(BaseModel):
     sort_order: int
     created_at: datetime
     updated_at: datetime
+    group_ids: list[int] = Field(default_factory=list)
 
     class Config:
         from_attributes = True

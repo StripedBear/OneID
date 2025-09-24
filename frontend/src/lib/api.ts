@@ -64,6 +64,27 @@ export interface OTPResponse {
   expires_in: number;
 }
 
+// Channel types
+export interface ChannelCreate {
+  type: string;
+  value: string;
+  label?: string;
+  is_public: boolean;
+  is_primary: boolean;
+  sort_order: number;
+  group_ids: number[];
+}
+
+export interface ChannelUpdate {
+  type?: string;
+  value?: string;
+  label?: string;
+  is_public?: boolean;
+  is_primary?: boolean;
+  sort_order?: number;
+  group_ids?: number[];
+}
+
 export async function api<T>(
   path: string,
   opts: RequestInit = {},
@@ -134,5 +155,28 @@ export const recoveryApi = {
 
   async getSecurityInfo(token: string): Promise<SecurityInfo> {
     return api<SecurityInfo>("/auth/security", { method: "GET" }, token);
+  },
+};
+
+// Channels API
+export const channelsApi = {
+  async getChannels(token: string): Promise<Channel[]> {
+    return api<Channel[]>("/channels", { method: "GET" }, token);
+  },
+
+  async createChannel(data: ChannelCreate, token: string): Promise<Channel> {
+    return api<Channel>("/channels", { method: "POST", body: JSON.stringify(data) }, token);
+  },
+
+  async updateChannel(id: number, data: ChannelUpdate, token: string): Promise<Channel> {
+    return api<Channel>(`/channels/${id}`, { method: "PUT", body: JSON.stringify(data) }, token);
+  },
+
+  async deleteChannel(id: number, token: string): Promise<void> {
+    return api<void>(`/channels/${id}`, { method: "DELETE" }, token);
+  },
+
+  async removeChannelFromGroup(channelId: number, groupId: number, token: string): Promise<void> {
+    return api<void>(`/channels/${channelId}/groups/${groupId}`, { method: "DELETE" }, token);
   },
 };

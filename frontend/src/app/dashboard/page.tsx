@@ -53,6 +53,7 @@ export default function DashboardPage() {
   const [showAddGroup, setShowAddGroup] = useState(false);
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
+  const [currentGroupId, setCurrentGroupId] = useState<number | null>(null);
 
   const load = useCallback(async (currentToken: string) => {
     try {
@@ -90,7 +91,11 @@ export default function DashboardPage() {
     setBusy(true);
     setError(null);
     try {
-      const created = await api<Channel>("/channels", { method:"POST", body: JSON.stringify(form) }, token);
+      const channelData = {
+        ...form,
+        group_ids: form.group_id ? [form.group_id] : []
+      };
+      const created = await api<Channel>("/channels", { method:"POST", body: JSON.stringify(channelData) }, token);
       setChannels((prev) => [...prev, created].sort((a,b)=> (a.sort_order-b.sort_order) || (a.id-b.id)));
       setShowAddChannel(false);
     } catch (e: unknown) {
@@ -106,12 +111,17 @@ export default function DashboardPage() {
     setBusy(true);
     setError(null);
     try {
+      const channelData = {
+        ...form,
+        group_ids: form.group_id ? [form.group_id] : []
+      };
       const updated = await api<Channel>(`/channels/${id}`, { 
         method: "PUT", 
-        body: JSON.stringify(form) 
+        body: JSON.stringify(channelData) 
       }, token);
       setChannels((prev) => prev.map(c => c.id === id ? updated : c));
       setEditingChannel(null);
+      setCurrentGroupId(null);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to update channel');
     } finally {
@@ -119,27 +129,56 @@ export default function DashboardPage() {
     }
   }, [token]);
 
-  const removeChannel = useCallback(async (id: number) => {
+  const removeChannel = useCallback(async (id: number, groupId?: number) => {
     if (!token) return;
     
     const channel = channels.find(c => c.id === id);
     const channelName = channel ? (channel.label || channel.type) : 'this channel';
     
-    if (!confirm(`Are you sure you want to delete ${channelName}?`)) {
-      return;
+    // Если канал в нескольких группах, предлагаем выбор
+    if (channel && channel.group_ids.length > 1 && groupId) {
+      const group = groups.find(g => g.id === groupId);
+      const groupName = group ? group.name : 'this group';
+      
+      if (!confirm(`Remove ${channelName} from ${groupName}?`)) {
+        return;
+      }
+      
+      setBusy(true);
+      try {
+        await api(`/channels/${id}/groups/${groupId}`, { method:"DELETE" }, token);
+        // Обновляем канал в состоянии
+        setChannels((prev) => prev.map(c => 
+          c.id === id 
+            ? { ...c, group_ids: c.group_ids.filter(gid => gid !== groupId) }
+            : c
+        ));
+        setEditingChannel(null);
+        setCurrentGroupId(null);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Failed to remove channel from group');
+      } finally {
+        setBusy(false);
+      }
+    } else {
+      // Полное удаление канала
+      if (!confirm(`Are you sure you want to delete ${channelName}?`)) {
+        return;
+      }
+      
+      setBusy(true);
+      try {
+        await api(`/channels/${id}`, { method:"DELETE" }, token);
+        setChannels((prev)=> prev.filter(c=>c.id!==id));
+        setEditingChannel(null);
+        setCurrentGroupId(null);
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Failed to delete channel');
+      } finally {
+        setBusy(false);
+      }
     }
-    
-    setBusy(true);
-    try {
-      await api(`/channels/${id}`, { method:"DELETE" }, token);
-      setChannels((prev)=> prev.filter(c=>c.id!==id));
-      setEditingChannel(null);
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to delete channel');
-    } finally {
-      setBusy(false);
-    }
-  }, [token, channels]);
+  }, [token, channels, groups]);
 
   // Group functions
   const addGroup = useCallback(async (form: GroupCreate) => {
@@ -233,16 +272,26 @@ export default function DashboardPage() {
     }
   }, [token]);
 
-  // Group channels by group_id or create default groups
+  // Group channels by groups - теперь канал может быть в нескольких группах
   const groupedChannels = channels.reduce((acc, channel) => {
-    const groupId = channel.group_id;
-    const group = groups.find(g => g.id === groupId);
-    const groupName = group ? group.name : 'No Group';
-    
-    if (!acc[groupName]) {
-      acc[groupName] = [];
+    if (channel.group_ids.length === 0) {
+      // Канал без групп
+      if (!acc['No Group']) {
+        acc['No Group'] = [];
+      }
+      acc['No Group'].push(channel);
+    } else {
+      // Канал в группах - добавляем в каждую группу
+      channel.group_ids.forEach(groupId => {
+        const group = groups.find(g => g.id === groupId);
+        const groupName = group ? group.name : `Group ${groupId}`;
+        
+        if (!acc[groupName]) {
+          acc[groupName] = [];
+        }
+        acc[groupName].push(channel);
+      });
     }
-    acc[groupName].push(channel);
     return acc;
   }, {} as Record<string, Channel[]>);
 
@@ -380,16 +429,24 @@ export default function DashboardPage() {
 
             {/* Channel Groups */}
             <div className="space-y-8">
-              {Object.entries(groupedChannels).map(([groupName, groupChannels]) => (
-                <div key={groupName} className="bg-slate-800 rounded-xl p-6 border border-slate-700">
-                  <h2 className="text-xl font-semibold text-white mb-6">{groupName}</h2>
-                  <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    {groupChannels.map((channel) => (
-                      <div
-                        key={channel.id}
-                        onClick={() => setEditingChannel(channel)}
-                        className="bg-slate-700 hover:bg-slate-600 rounded-lg p-4 cursor-pointer transition-all duration-200 hover:scale-105 border border-slate-600 hover:border-slate-500"
-                      >
+              {Object.entries(groupedChannels).map(([groupName, groupChannels]) => {
+                // Найти groupId для этой группы
+                const group = groups.find(g => g.name === groupName);
+                const groupId = group ? group.id : null;
+                
+                return (
+                  <div key={groupName} className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+                    <h2 className="text-xl font-semibold text-white mb-6">{groupName}</h2>
+                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                      {groupChannels.map((channel) => (
+                        <div
+                          key={channel.id}
+                          onClick={() => {
+                            setEditingChannel(channel);
+                            setCurrentGroupId(groupId);
+                          }}
+                          className="bg-slate-700 hover:bg-slate-600 rounded-lg p-4 cursor-pointer transition-all duration-200 hover:scale-105 border border-slate-600 hover:border-slate-500"
+                        >
                         <div className="flex flex-col items-center gap-3">
                           <div className="w-12 h-12 flex items-center justify-center">
                             <ChannelIcon type={channel.type} />
@@ -411,7 +468,8 @@ export default function DashboardPage() {
                     ))}
                   </div>
                 </div>
-              ))}
+                );
+              })}
 
               {channels.length === 0 && (
                 <div className="text-center py-16">
@@ -489,7 +547,10 @@ export default function DashboardPage() {
       {editingChannel && (
         <div 
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-          onClick={() => setEditingChannel(null)}
+          onClick={() => {
+            setEditingChannel(null);
+            setCurrentGroupId(null);
+          }}
         >
           <div 
             className="bg-slate-800 p-6 rounded-2xl shadow-2xl max-w-md w-full"
@@ -498,8 +559,11 @@ export default function DashboardPage() {
             <ChannelForm 
               channel={editingChannel}
               onSubmit={(form) => updateChannel(editingChannel.id!, form)} 
-              onCancel={() => setEditingChannel(null)}
-              onDelete={() => removeChannel(editingChannel.id!)}
+              onCancel={() => {
+                setEditingChannel(null);
+                setCurrentGroupId(null);
+              }}
+              onDelete={() => removeChannel(editingChannel.id!, currentGroupId || undefined)}
               disabled={busy}
               groups={groups}
             />

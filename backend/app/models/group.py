@@ -23,4 +23,4 @@ class Group(Base):
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="groups")
-    channels: Mapped[list["Channel"]] = relationship("Channel", back_populates="group")
+    channels: Mapped[list["Channel"]] = relationship("Channel", secondary="channel_groups", back_populates="groups")

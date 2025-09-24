@@ -40,7 +40,7 @@ def create_oauth_channels(db: Session, user, provider: str, user_info: dict):
                         is_public=False,  # Changed to False
                         is_primary=False,
                         sort_order=0,
-                        group_id=oauth_group.id
+                        group_ids=[oauth_group.id] if oauth_group else []
                     )
         
         elif provider == "google":
@@ -57,7 +57,7 @@ def create_oauth_channels(db: Session, user, provider: str, user_info: dict):
                         is_public=False,  # Changed to False
                         is_primary=True,
                         sort_order=0,
-                        group_id=oauth_group.id
+                        group_ids=[oauth_group.id] if oauth_group else []
                     )
         
         elif provider == "discord":
@@ -75,7 +75,7 @@ def create_oauth_channels(db: Session, user, provider: str, user_info: dict):
                         is_public=False,  # Changed to False
                         is_primary=False,
                         sort_order=0,
-                        group_id=oauth_group.id
+                        group_ids=[oauth_group.id] if oauth_group else []
                     )
         
         elif provider == "telegram":
@@ -93,7 +93,7 @@ def create_oauth_channels(db: Session, user, provider: str, user_info: dict):
                         is_public=False,  # Changed to False
                         is_primary=False,
                         sort_order=0,
-                        group_id=oauth_group.id
+                        group_ids=[oauth_group.id] if oauth_group else []
                     )
     
     except Exception as e:

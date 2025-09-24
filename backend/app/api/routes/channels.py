@@ -32,7 +32,7 @@ def create_channel(
         is_public=payload.is_public,
         is_primary=payload.is_primary,
         sort_order=payload.sort_order,
-        group_id=payload.group_id,
+        group_ids=payload.group_ids,
     )
     return ch
 
@@ -67,7 +67,7 @@ def update_channel(
         is_public=payload.is_public,
         is_primary=payload.is_primary,
         sort_order=payload.sort_order,
-        group_id=payload.group_id,
+        group_ids=payload.group_ids,
     )
     return ch
 
@@ -82,4 +82,17 @@ def delete_channel(
     if not ch or ch.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Channel not found")
     crud_channel.delete(db, ch)
+    return None
+
+
+@router.delete("/{channel_id}/groups/{group_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Удалить канал из группы")
+def remove_channel_from_group(
+    channel_id: int,
+    group_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    success = crud_channel.remove_from_group(db, channel_id, group_id, current_user.id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Channel or group not found")
     return None
