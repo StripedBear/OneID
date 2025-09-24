@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import Avatar from "@/components/Avatar";
-import { ChevronDown, Settings, LogOut, User, Trash2 } from "lucide-react";
+import { ChevronDown, Settings, LogOut, User } from "lucide-react";
 
 interface UserMenuProps {
   user: {
@@ -62,11 +62,6 @@ export default function UserMenu({ user }: UserMenuProps) {
 
   const handleProfile = () => {
     router.push(`/${user.username}`);
-    setIsOpen(false);
-  };
-
-  const handleDeleteAccount = () => {
-    router.push("/settings/delete-account");
     setIsOpen(false);
   };
 
@@ -132,14 +127,6 @@ export default function UserMenu({ user }: UserMenuProps) {
             </button>
 
             <div className="border-t border-slate-700 my-2"></div>
-
-            <button
-              onClick={handleDeleteAccount}
-              className="w-full flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-900/20 transition-colors"
-            >
-              <Trash2 size={16} />
-              Delete Account
-            </button>
 
             <button
               onClick={handleLogout}
