@@ -175,3 +175,14 @@ def update_user_profile(db: Session, user_id: int, profile_data: dict) -> User:
     db.commit()
     db.refresh(user)
     return user
+
+
+def delete_user(db: Session, user_id: int) -> bool:
+    """Delete user and all associated data."""
+    user = get(db, user_id)
+    if not user:
+        return False
+    
+    db.delete(user)
+    db.commit()
+    return True

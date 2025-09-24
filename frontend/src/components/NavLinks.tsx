@@ -1,14 +1,37 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import UserMenu from "@/components/UserMenu";
+import { api } from "@/lib/api";
+import type { UserPublic } from "@/types";
 
 export default function NavLinks() {
-  const { isAuthenticated, clearToken } = useAuth();
+  const { isAuthenticated, clearToken, token } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<UserPublic | null>(null);
   const router = useRouter();
+
+  // Load user data when authenticated
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      loadUser();
+    } else {
+      setUser(null);
+    }
+  }, [isAuthenticated, token]);
+
+  const loadUser = async () => {
+    if (!token) return;
+    try {
+      const userData = await api<UserPublic>("/auth/me", {}, token);
+      setUser(userData);
+    } catch (err) {
+      console.error('Failed to load user:', err);
+    }
+  };
 
   const handleLogout = () => {
     clearToken();
@@ -24,14 +47,7 @@ export default function NavLinks() {
         {!isAuthenticated && <Link href="/register" className="hover:underline">Sign Up</Link>}
         {isAuthenticated && <Link href="/dashboard" className="hover:underline">Dashboard</Link>}
         {isAuthenticated && <Link href="/dashboard/contacts" className="hover:underline">Contacts</Link>}
-        {isAuthenticated && (
-          <button
-            onClick={handleLogout}
-            className="text-sm border border-slate-700 px-3 py-1 rounded-xl hover:bg-slate-800"
-          >
-            Logout
-          </button>
-        )}
+        {isAuthenticated && user && <UserMenu user={user} />}
       </nav>
 
       {/* Mobile Menu Button */}

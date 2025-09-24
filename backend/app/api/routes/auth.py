@@ -188,3 +188,20 @@ async def remove_avatar(
             status_code=500, 
             detail=f"Failed to remove avatar: {str(e)}"
         )
+
+
+@router.delete("/delete-account", status_code=status.HTTP_204_NO_CONTENT)
+def delete_account(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Delete user account and all associated data."""
+    try:
+        # Delete user (this will cascade delete all related data due to cascade="all, delete-orphan")
+        crud_user.delete_user(db, current_user.id)
+        return None
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to delete account: {str(e)}"
+        )
