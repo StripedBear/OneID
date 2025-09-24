@@ -164,16 +164,26 @@ export default function UserProfile({ params }: UserProfileProps) {
   const { user, channels, groups } = profile;
   const publicChannels = channels.filter(ch => ch.is_public);
 
-  // Group channels by group_id
+  // Group channels by groups - теперь канал может быть в нескольких группах
   const groupedChannels = publicChannels.reduce((acc, channel) => {
-    const groupId = channel.group_id;
-    const group = groups.find(g => g.id === groupId);
-    const groupName = group ? group.name : 'Other';
-    
-    if (!acc[groupName]) {
-      acc[groupName] = [];
+    if (channel.group_ids.length === 0) {
+      // Канал без групп
+      if (!acc['Other']) {
+        acc['Other'] = [];
+      }
+      acc['Other'].push(channel);
+    } else {
+      // Канал в группах - добавляем в каждую группу
+      channel.group_ids.forEach(groupId => {
+        const group = groups.find(g => g.id === groupId);
+        const groupName = group ? group.name : `Group ${groupId}`;
+        
+        if (!acc[groupName]) {
+          acc[groupName] = [];
+        }
+        acc[groupName].push(channel);
+      });
     }
-    acc[groupName].push(channel);
     return acc;
   }, {} as Record<string, typeof publicChannels>);
 

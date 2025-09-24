@@ -34,7 +34,7 @@ type NewChannel = {
   is_public: boolean;
   is_primary: boolean;
   sort_order: number;
-  group_id?: number | null;
+  group_id?: number | null; // Оставляем для совместимости с формой
 };
 
 const channelTypes = ["phone","email","telegram","whatsapp","signal","instagram","twitter","facebook","linkedin","website","github","custom"];
@@ -635,7 +635,7 @@ function ChannelForm({
     is_public: channel?.is_public ?? false,  // Changed to false
     is_primary: channel?.is_primary ?? false,
     sort_order: channel?.sort_order || 0,
-    group_id: channel?.group_id || null
+    group_id: channel?.group_ids?.[0] || null // Берем первую группу для совместимости
   });
 
   const handleSubmit = (e: React.FormEvent) => {
