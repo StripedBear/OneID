@@ -98,6 +98,8 @@ export default function DashboardPage() {
       const created = await api<Channel>("/channels", { method:"POST", body: JSON.stringify(channelData) }, token);
       setChannels((prev) => [...prev, created].sort((a,b)=> (a.sort_order-b.sort_order) || (a.id-b.id)));
       setShowAddChannel(false);
+      // Перезагружаем данные для обновления группировки
+      load(token);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to create channel');
     } finally {
@@ -122,6 +124,8 @@ export default function DashboardPage() {
       setChannels((prev) => prev.map(c => c.id === id ? updated : c));
       setEditingChannel(null);
       setCurrentGroupId(null);
+      // Перезагружаем данные для обновления группировки
+      load(token);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Failed to update channel');
     } finally {

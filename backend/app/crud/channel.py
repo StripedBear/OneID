@@ -23,7 +23,7 @@ def create(db: Session, *, user: User, group_ids: List[int] = None, **data) -> C
     db.flush()  # Flush to get the channel ID
     
     # Add to groups if specified
-    if group_ids:
+    if group_ids is not None:
         groups = db.query(Group).filter(Group.id.in_(group_ids), Group.user_id == user.id).all()
         ch.groups.extend(groups)
     
@@ -42,10 +42,9 @@ def update(db: Session, ch: Channel, group_ids: List[int] = None, **data) -> Cha
     if group_ids is not None:
         # Clear existing groups
         ch.groups.clear()
-        # Add new groups
-        if group_ids:
-            groups = db.query(Group).filter(Group.id.in_(group_ids), Group.user_id == ch.user_id).all()
-            ch.groups.extend(groups)
+        # Add new groups (even if empty array)
+        groups = db.query(Group).filter(Group.id.in_(group_ids), Group.user_id == ch.user_id).all()
+        ch.groups.extend(groups)
     
     db.add(ch)
     db.commit()
