@@ -8,7 +8,7 @@ import { ChannelIcon } from "@/components/ChannelIcon";
 import AvatarButton from "@/components/AvatarButton";
 import QRCodeCard from "@/components/QRCodeCard";
 import Link from "next/link";
-import { Plus, Edit3, Trash2, Users } from "lucide-react";
+import { Plus, Edit3, Trash2, Users, Edit } from "lucide-react";
 
 // Helper function to get display name
 const getDisplayName = (user: UserPublic): string => {
@@ -52,6 +52,7 @@ export default function DashboardPage() {
   const [showAddChannel, setShowAddChannel] = useState(false);
   const [showAddGroup, setShowAddGroup] = useState(false);
   const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
+  const [editingGroup, setEditingGroup] = useState<Group | null>(null);
 
   const load = useCallback(async (currentToken: string) => {
     try {
@@ -184,6 +185,25 @@ export default function DashboardPage() {
     }
   }, [token, groups]);
 
+  const editGroup = useCallback((group: Group) => {
+    setEditingGroup(group);
+  }, []);
+
+  const updateGroup = useCallback(async (groupData: GroupCreate) => {
+    if (!token || !editingGroup) return;
+    
+    setBusy(true);
+    try {
+      const updatedGroup = await groupsApi.updateGroup(editingGroup.id, groupData, token);
+      setGroups((prev) => prev.map(g => g.id === editingGroup.id ? updatedGroup : g));
+      setEditingGroup(null);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to update group');
+    } finally {
+      setBusy(false);
+    }
+  }, [token, editingGroup]);
+
   const updateAvatar = useCallback(async (newAvatarUrl: string) => {
     if (!token) return;
     try {
@@ -302,17 +322,26 @@ export default function DashboardPage() {
             </div>
             <div className="space-y-2">
               {groups.map((group) => (
-                <div key={group.id} className="flex items-center justify-between text-sm text-slate-400 py-2 px-3 rounded-lg hover:bg-slate-700 transition-colors">
+                <div key={group.id} className="group flex items-center justify-between text-sm text-slate-400 py-2 px-3 rounded-lg hover:bg-slate-700 transition-colors">
                   <span>
                     {group.name} ({groupedChannels[group.name]?.length || 0})
                   </span>
-                  <button
-                    onClick={() => removeGroup(group.id)}
-                    className="text-red-400 hover:text-red-300 p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Delete group"
-                  >
-                    <Trash2 size={12} />
-                  </button>
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => editGroup(group)}
+                      className="text-blue-400 hover:text-blue-300 p-1"
+                      title="Edit group"
+                    >
+                      <Edit size={12} />
+                    </button>
+                    <button
+                      onClick={() => removeGroup(group.id)}
+                      className="text-red-400 hover:text-red-300 p-1"
+                      title="Delete group"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
                 </div>
               ))}
               {groupedChannels['No Group'] && (
@@ -491,6 +520,26 @@ export default function DashboardPage() {
             <GroupForm 
               onSubmit={addGroup} 
               onCancel={() => setShowAddGroup(false)}
+              disabled={busy}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Edit Group Modal */}
+      {editingGroup && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          onClick={() => setEditingGroup(null)}
+        >
+          <div 
+            className="bg-slate-800 p-6 rounded-2xl shadow-2xl max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <GroupForm 
+              group={editingGroup}
+              onSubmit={updateGroup} 
+              onCancel={() => setEditingGroup(null)}
               disabled={busy}
             />
           </div>
@@ -735,34 +784,40 @@ function ProfileEditForm({
 }
 
 function GroupForm({ 
+  group,
   onSubmit, 
   onCancel,
   disabled 
 }: { 
+  group?: Group;
   onSubmit: (form: GroupCreate) => void; 
   onCancel: () => void;
   disabled: boolean; 
 }) {
   const [form, setForm] = useState({
-    name: "",
-    description: "",
-    sort_order: 0
+    name: group?.name || "",
+    description: group?.description || "",
+    sort_order: group?.sort_order || 0
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({ ...form, sort_order: Number(form.sort_order) || 0 });
-    // Reset form after submission
-    setForm({
-      name: "",
-      description: "",
-      sort_order: 0
-    });
+    // Reset form after submission only for new groups
+    if (!group) {
+      setForm({
+        name: "",
+        description: "",
+        sort_order: 0
+      });
+    }
   };
   
   return (
     <div>
-      <h3 className="text-lg font-semibold text-white mb-4">Add New Group</h3>
+      <h3 className="text-lg font-semibold text-white mb-4">
+        {group ? 'Edit Group' : 'Add New Group'}
+      </h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm text-slate-300 mb-2">Group Name</label>
@@ -810,7 +865,7 @@ function GroupForm({
             disabled={disabled}
             className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
           >
-            {disabled ? "Creating..." : "Create Group"}
+            {disabled ? (group ? "Saving..." : "Creating...") : (group ? "Save Changes" : "Create Group")}
           </button>
         </div>
       </form>
