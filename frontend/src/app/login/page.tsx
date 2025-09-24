@@ -86,6 +86,15 @@ export default function LoginPage() {
         
         <SocialAuthButtons />
         
+        <div className="text-center mt-4">
+          <Link 
+            href="/auth/recover" 
+            className="text-sm text-slate-400 hover:text-slate-300 underline"
+          >
+            Forgot access? Recover
+          </Link>
+        </div>
+        
         <p className="text-center text-sm text-slate-400 mt-4">
           Don't have an account?{" "}
           <Link href="/register" className="text-blue-400 hover:text-blue-300 underline">
