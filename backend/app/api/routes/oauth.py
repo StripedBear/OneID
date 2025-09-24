@@ -32,16 +32,16 @@ def create_oauth_channels(db: Session, user, provider: str, user_info: dict):
                 # Check if channel already exists
                 existing_channels = crud_channel.list_for_user(db, user.id)
                 if not any(ch.type == "github" and ch.value == github_url for ch in existing_channels):
-                crud_channel.create(
-                    db, user=user,
-                    type="github",
-                    value=github_url,
-                    label="GitHub Profile",
-                    is_public=False,  # Changed to False
-                    is_primary=False,
-                    sort_order=0,
-                    group_id=oauth_group.id
-                )
+                    crud_channel.create(
+                        db, user=user,
+                        type="github",
+                        value=github_url,
+                        label="GitHub Profile",
+                        is_public=False,  # Changed to False
+                        is_primary=False,
+                        sort_order=0,
+                        group_id=oauth_group.id
+                    )
         
         elif provider == "google":
             # Add Google profile (if available)
