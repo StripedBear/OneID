@@ -3,6 +3,7 @@ from enum import Enum
 from sqlalchemy import String, Integer, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
+from app.models.channel_groups import channel_groups
 
 
 class ChannelType(str, Enum):
@@ -41,4 +42,4 @@ class Channel(Base):
     # обратная связь к пользователю
     user: Mapped["User"] = relationship(back_populates="channels")
     # связь многие-ко-многим с группами
-    groups: Mapped[list["Group"]] = relationship("Group", secondary="channel_groups", back_populates="channels")
+    groups: Mapped[list["Group"]] = relationship("Group", secondary=channel_groups, back_populates="channels")

@@ -2,6 +2,7 @@ from datetime import datetime
 from sqlalchemy import String, Integer, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
+from app.models.channel_groups import channel_groups
 
 
 class Group(Base):
@@ -23,4 +24,4 @@ class Group(Base):
 
     # Relationships
     user: Mapped["User"] = relationship("User", back_populates="groups")
-    channels: Mapped[list["Channel"]] = relationship("Channel", secondary="channel_groups", back_populates="groups")
+    channels: Mapped[list["Channel"]] = relationship("Channel", secondary=channel_groups, back_populates="groups")
