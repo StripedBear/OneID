@@ -32,16 +32,16 @@ def create_oauth_channels(db: Session, user, provider: str, user_info: dict):
                 # Check if channel already exists
                 existing_channels = crud_channel.list_for_user(db, user.id)
                 if not any(ch.type == "github" and ch.value == github_url for ch in existing_channels):
-                    crud_channel.create(
-                        db, user=user,
-                        type="github",
-                        value=github_url,
-                        label="GitHub Profile",
-                        is_public=True,
-                        is_primary=False,
-                        sort_order=0,
-                        group_id=oauth_group.id
-                    )
+                crud_channel.create(
+                    db, user=user,
+                    type="github",
+                    value=github_url,
+                    label="GitHub Profile",
+                    is_public=False,  # Changed to False
+                    is_primary=False,
+                    sort_order=0,
+                    group_id=oauth_group.id
+                )
         
         elif provider == "google":
             # Add Google profile (if available)
@@ -54,7 +54,7 @@ def create_oauth_channels(db: Session, user, provider: str, user_info: dict):
                         type="email",
                         value=user_info["email"],
                         label="Google Email",
-                        is_public=True,
+                        is_public=False,  # Changed to False
                         is_primary=True,
                         sort_order=0,
                         group_id=oauth_group.id
@@ -72,7 +72,7 @@ def create_oauth_channels(db: Session, user, provider: str, user_info: dict):
                         type="custom",
                         value=discord_handle,
                         label="Discord",
-                        is_public=True,
+                        is_public=False,  # Changed to False
                         is_primary=False,
                         sort_order=0,
                         group_id=oauth_group.id
@@ -90,7 +90,7 @@ def create_oauth_channels(db: Session, user, provider: str, user_info: dict):
                         type="telegram",
                         value=telegram_handle,
                         label="Telegram",
-                        is_public=True,
+                        is_public=False,  # Changed to False
                         is_primary=False,
                         sort_order=0,
                         group_id=oauth_group.id

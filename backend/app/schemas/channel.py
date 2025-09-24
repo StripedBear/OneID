@@ -6,7 +6,7 @@ class ChannelBase(BaseModel):
     type: str = Field(description="Тип канала (phone, email, telegram, ...)")
     value: str = Field(description="Значение: телефон/емейл/@handle/URL")
     label: str | None = None
-    is_public: bool = True
+    is_public: bool = False  # Changed to False
     is_primary: bool = False
     sort_order: int = 0
     group_id: int | None = None

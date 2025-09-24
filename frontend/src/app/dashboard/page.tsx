@@ -519,7 +519,7 @@ function ChannelForm({
     type: channel?.type || "telegram",
     value: channel?.value || "",
     label: channel?.label || "",
-    is_public: channel?.is_public ?? true,
+    is_public: channel?.is_public ?? false,  // Changed to false
     is_primary: channel?.is_primary ?? false,
     sort_order: channel?.sort_order || 0,
     group_id: channel?.group_id || null
