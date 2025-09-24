@@ -45,3 +45,11 @@ export type TokenResponse = {
   access_token: string;
   token_type: "bearer";
 };
+
+export type SecurityInfo = {
+  connected: number;
+  total: number;
+  methods: string[];
+  level: string;
+  recommendation: string;
+};
