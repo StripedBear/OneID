@@ -1,5 +1,8 @@
 const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "https://oneid-m4s5.onrender.com/api/v1";
 
+// Import types
+import type { Channel } from "@/types";
+
 // Types
 export interface Group {
   id: number;
