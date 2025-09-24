@@ -95,7 +95,9 @@ export default function DashboardPage() {
         ...form,
         group_ids: form.group_id ? [form.group_id] : []
       };
+      console.log('Creating channel with data:', channelData);
       const created = await api<Channel>("/channels", { method:"POST", body: JSON.stringify(channelData) }, token);
+      console.log('Created channel:', created);
       setChannels((prev) => [...prev, created].sort((a,b)=> (a.sort_order-b.sort_order) || (a.id-b.id)));
       setShowAddChannel(false);
       // Перезагружаем данные для обновления группировки
@@ -278,6 +280,7 @@ export default function DashboardPage() {
 
   // Group channels by groups - теперь канал может быть в нескольких группах
   const groupedChannels = channels.reduce((acc, channel) => {
+    console.log('Processing channel:', channel.id, 'with group_ids:', channel.group_ids);
     if (channel.group_ids.length === 0) {
       // Канал без групп
       if (!acc['No Group']) {
